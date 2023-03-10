@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { genders } = require("../constants");
 const Schema = mongoose.Schema;
 
 const customerSchema = new Schema({
@@ -12,6 +13,24 @@ const customerSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Order",
       required: true,
+    },
+  ],
+  cart: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      size: {
+        type: String,
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        default: 1,
+      },
     },
   ],
   name: {
@@ -32,7 +51,7 @@ const customerSchema = new Schema({
   },
   gender: {
     type: String,
-    enum: genders,
+    enum: Object.values(genders),
     required: true,
   },
   birthday: {

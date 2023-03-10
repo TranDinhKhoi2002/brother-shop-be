@@ -519,22 +519,18 @@ const products = [
 exports.generateData = async () => {
   // const categoryId = faker.database.mongodbObjectId();
   // const categoryProducts = [];
-
   // const filteredProducts = products.filter(
   //   (product) => product.name.includes("Nón") || product.name.includes("Vớ N") || product.name.includes("Dây Nịt")
   // );
   // console.log(filteredProducts);
-
   // const { resources: resourcesMainImages } = await cloudinary.search
   //   .expression("folder:brothershop/products/mainImg/phu-kien")
   //   .execute();
   // const mainImgPublicIds = resourcesMainImages.map((item) => item.public_id);
-
   // const { resources: resourcesSubImages } = await cloudinary.search
   //   .expression("folder:brothershop/products/subImg/phu-kien")
   //   .execute();
   // const subImgPublicIds = resourcesSubImages.map((item) => item.public_id);
-
   // filteredProducts.reverse().forEach(async (product, index) => {
   //   const productId = faker.database.mongodbObjectId();
   //   categoryProducts.push(productId);
@@ -558,7 +554,6 @@ exports.generateData = async () => {
   //   });
   //   await newProduct.save();
   // });
-
   // const category = new Category({
   //   name: "PHỤ KIỆN",
   //   types: [
@@ -579,40 +574,33 @@ exports.generateData = async () => {
   //   _id: categoryId,
   // });
   // await category.save();
-
   // const category = await Category.findOne({ name: "PHỤ KIỆN" }).populate("products");
   // const simpleTShirtTypeIndex = category.types.findIndex((item) => item.type === "Dây Nịt Da");
-
   // const simpleTShirtProducts = category.products.filter((product) => product.name.includes("Dây Nịt"));
   // const simpleTShirtProductIds = simpleTShirtProducts.map((product) => product._id);
-
   // category.types[simpleTShirtTypeIndex].products = simpleTShirtProductIds;
   // await category.save();
-
-  const { resources: resourcesMainImages } = await cloudinary.search
-    .expression("folder:brothershop/banners/ready-to-sell/trouser/mainImg")
-    .execute();
-  const mainImgPublicId = resourcesMainImages[0].public_id;
-
-  const { resources: resourcesSubImages } = await cloudinary.search
-    .expression("folder:brothershop/banners/ready-to-sell/trouser/subImg")
-    .execute();
-  const subImgPublicIds = resourcesSubImages.map((item) => item.public_id);
-
-  const trouserProductsIds = await Product.find({ name: { $regex: "Quần" } })
-    .select("_id")
-    .limit(4);
-
-  const event = new Event({
-    tag: "/quan-thoi-thuong",
-    title: "Mở Bán Quần Dài",
-    description:
-      "Quần dài là một trong những sản phẩm thời trang cơ bản không thể thiếu trong tủ đồ của bất kỳ ai. Với thiết kế đơn giản và chất liệu cao cấp, quần dài có thể dễ dàng kết hợp với nhiều kiểu áo khác nhau để tạo ra nhiều phong cách khác nhau. Chúng tôi tự hào giới thiệu đến bạn bộ sưu tập quần dài mới nhất của chúng tôi, với nhiều kiểu dáng và màu sắc khác nhau. Chất liệu vải mềm mại, thoáng mát và co giãn tốt giúp bạn cảm thấy thoải mái khi sử dụng. Hãy đến với chúng tôi để trải nghiệm những sản phẩm thời trang chất lượng cao với giá cả hợp lý.",
-    mainImg: mainImgPublicId,
-    subImgs: subImgPublicIds,
-    relatedProducts: trouserProductsIds,
-  });
-  await event.save();
+  // const { resources: resourcesMainImages } = await cloudinary.search
+  //   .expression("folder:brothershop/banners/ready-to-sell/trouser/mainImg")
+  //   .execute();
+  // const mainImgPublicId = resourcesMainImages[0].public_id;
+  // const { resources: resourcesSubImages } = await cloudinary.search
+  //   .expression("folder:brothershop/banners/ready-to-sell/trouser/subImg")
+  //   .execute();
+  // const subImgPublicIds = resourcesSubImages.map((item) => item.public_id);
+  // const trouserProductsIds = await Product.find({ name: { $regex: "Quần" } })
+  //   .select("_id")
+  //   .limit(4);
+  // const event = new Event({
+  //   tag: "/quan-thoi-thuong",
+  //   title: "Mở Bán Quần Dài",
+  //   description:
+  //     "Quần dài là một trong những sản phẩm thời trang cơ bản không thể thiếu trong tủ đồ của bất kỳ ai. Với thiết kế đơn giản và chất liệu cao cấp, quần dài có thể dễ dàng kết hợp với nhiều kiểu áo khác nhau để tạo ra nhiều phong cách khác nhau. Chúng tôi tự hào giới thiệu đến bạn bộ sưu tập quần dài mới nhất của chúng tôi, với nhiều kiểu dáng và màu sắc khác nhau. Chất liệu vải mềm mại, thoáng mát và co giãn tốt giúp bạn cảm thấy thoải mái khi sử dụng. Hãy đến với chúng tôi để trải nghiệm những sản phẩm thời trang chất lượng cao với giá cả hợp lý.",
+  //   mainImg: mainImgPublicId,
+  //   subImgs: subImgPublicIds,
+  //   relatedProducts: trouserProductsIds,
+  // });
+  // await event.save();
 };
 
 exports.clearData = async () => {

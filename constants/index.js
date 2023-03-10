@@ -32,6 +32,7 @@ const roleNames = {
 const genders = {
   MALE: "Nam",
   FEMALE: "Nữ",
+  OTHER: "Khác",
 };
 
 const userStatus = {
