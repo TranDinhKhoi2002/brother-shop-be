@@ -27,6 +27,8 @@ const imageRoutes = require("./routes/image");
 const eventRoutes = require("./routes/event");
 const paymentRoutes = require("./routes/payment");
 const orderRoutes = require("./routes/order");
+const dataRoutes = require("./routes/data");
+const cartRoutes = require("./routes/cart");
 
 app.use("/auth", authRoutes);
 app.use(productRoutes);
@@ -35,6 +37,8 @@ app.use(imageRoutes);
 app.use(eventRoutes);
 app.use(paymentRoutes);
 app.use(orderRoutes);
+app.use(dataRoutes);
+app.use(cartRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, validationErrors } = err;

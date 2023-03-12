@@ -2,6 +2,8 @@ require("dotenv").config();
 const sgMail = require("@sendgrid/mail");
 
 const Order = require("../models/order");
+const Customer = require("../models/customer");
+const AppError = require("../util/error");
 const { orderPaymentStatuses } = require("../constants");
 const { printNumberWithCommas } = require("../util/printNumberWithCommas");
 
@@ -70,26 +72,31 @@ exports.createOrder = async (req, res, next) => {
   }
 };
 
-exports.updateOrderPaid = async (req, res, next) => {
+exports.checkOutOrder = async (req, res, next) => {
   const orderId = req.params.orderId;
+  const accountId = req.accountId;
 
-  // try {
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      const error = new Error("Không tìm thấy đơn hàng");
+      error.statusCode = 404;
+      return next(error);
+    }
 
-  // } catch (err) {
-  //   const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-  //   error.statusCode = 500;
-  //   next(error);
-  // }
+    order.paymentStatus = orderPaymentStatuses.PAID;
+    await order.save();
 
-  const order = await Order.findById(orderId);
-  if (!order) {
-    const error = new Error("Không tìm thấy đơn hàng");
-    error.statusCode = 404;
-    return next(error);
+    const customer = await Customer.findOne({ account: accountId });
+    if (customer) {
+      customer.cart = [];
+      await customer.save();
+    }
+
+    res.status(200).json({ message: "Cập nhật đơn hàng thành công", cart: [] });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
   }
-
-  order.paymentStatus = orderPaymentStatuses.PAID;
-  order.save();
-
-  res.status(200).json({ message: "Cập nhật đơn hàng thành công" });
 };
