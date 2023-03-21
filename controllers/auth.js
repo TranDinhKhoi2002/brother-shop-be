@@ -27,7 +27,7 @@ exports.login = async (req, res, next) => {
       return next(error);
     }
 
-    const customer = await Customer.findOne({ account: account._id }).populate("account");
+    const customer = await Customer.findOne({ account: account._id }).populate("account").populate("cart.productId");
 
     const token = jwt.sign(
       {
