@@ -5,12 +5,12 @@ exports.getCommonData = async (req, res, next) => {
   try {
     const categories = await Category.find();
 
-    const accountId = req.accountId;
-    if (!accountId) {
+    const accountId = req.query.accountId;
+    if (!accountId || accountId === "undefined") {
       return res.status(200).json({ categories });
     }
 
-    const customer = await Customer.findOne({ account: accountId });
+    const customer = await Customer.findOne({ account: accountId }).populate({ path: "cart", populate: "productId" });
     if (!customer) {
       const error = new Error("Không tìm thấy khách hàng");
       error.statusCode = 404;

@@ -10,4 +10,6 @@ router.put("/cart/update-quantity", isAuth, cartController.updateQuantity);
 
 router.put("/cart/remove-item", isAuth, cartController.removeCartItem);
 
+router.put("/cart/remove-items", isAuth, cartController.removeCartItems);
+
 module.exports = router;
