@@ -1,3 +1,5 @@
+const { ITEMS_PER_PAGE } = require("../constants");
+const Category = require("../models/category");
 const Product = require("../models/product");
 
 exports.getProducts = async (req, res, next) => {
@@ -63,4 +65,57 @@ exports.getProductsByType = async (req, res, next) => {
     error.statusCode = 500;
     next(error);
   }
+};
+
+exports.getProductsByKeyword = async (req, res, next) => {
+  const keyword = req.params.keyword;
+  const page = +req.query.page || 1;
+
+  try {
+    const products = await Product.find({ name: { $regex: keyword, $options: "$i" } })
+      .populate("category")
+      .skip((page - 1) * ITEMS_PER_PAGE)
+      .limit(ITEMS_PER_PAGE);
+
+    const totalItems = await Product.find({ name: { $regex: keyword, $options: "$i" } }).countDocuments();
+
+    res.status(200).json({
+      products,
+      currentPage: page,
+      hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+      hasPreviousPage: page > 1,
+      nextPage: page + 1,
+      previousPage: page - 1,
+      lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+    });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.getProductsByFilters = async (req, res, next) => {
+  console.log(req.query.types === "null");
+  if (req.query.types === "null") {
+    return res.status(200).json({ products: null });
+  }
+
+  const types = req.query.types.split(",");
+
+  const products = [];
+  const category = await Category.findOne({ "types.type": types[0] }).populate({ path: "types", populate: "products" });
+
+  const categoryTypes = category.types;
+
+  for (const type of types) {
+    const categoryType = categoryTypes.find((item) => item.type === type);
+    products.push(...categoryType.products);
+  }
+
+  // try {
+
+  // } catch (error) {}
+
+  res.status(200).json({ products, category });
 };

@@ -108,24 +108,20 @@ exports.removeCartItems = async (req, res, next) => {
       throw new AppError(404, "Không tìm thấy người dùng");
     }
 
-    const updatedCart = [...customer.cart];
-
     for (const item of items) {
-      const existingCartItemIndex = customer.cart.findIndex(
+      const existingCartItem = customer.cart.find(
         (cartItem) => cartItem.productId._id.toString() === item.productId && cartItem.size === item.size
       );
 
-      if (existingCartItemIndex === -1) {
+      if (!existingCartItem) {
         throw new AppError(400, "Sản phẩm không tồn tại");
       }
 
-      updatedCart.splice(existingCartItemIndex, 1);
+      customer.cart = customer.cart.filter((cartItem) => cartItem !== existingCartItem);
     }
-
-    customer.cart = updatedCart;
     await customer.save();
 
-    res.status(200).json({ message: "Đã xóa sản phẩm khỏi giỏ hàng", cart: updatedCart });
+    res.status(200).json({ message: "Đã xóa sản phẩm khỏi giỏ hàng", cart: customer.cart });
   } catch (err) {
     next(err);
   }

@@ -47,6 +47,8 @@ const sizes = {
   SIZE_XL: "XL",
 };
 
+const ITEMS_PER_PAGE = 12;
+
 module.exports = {
   productStates,
   orderShippingStatuses,
@@ -55,4 +57,5 @@ module.exports = {
   genders,
   userStatus,
   sizes,
+  ITEMS_PER_PAGE,
 };
