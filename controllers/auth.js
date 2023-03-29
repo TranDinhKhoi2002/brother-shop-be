@@ -6,7 +6,6 @@ const sgMail = require("@sendgrid/mail");
 const Account = require("../models/account");
 const Customer = require("../models/customer");
 
-require("dotenv").config();
 sgMail.setApiKey(process.env.SG_API_KEY);
 
 exports.login = async (req, res, next) => {

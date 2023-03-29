@@ -15,11 +15,11 @@ exports.getProductsByCategory = async (req, res, next) => {
       );
 
       const currentType = currentCategory.types.find((item) => item._id.toString() === categoryId);
-      return res.status(200).json({ products: currentType.products });
+      return res.status(200).json({ products: currentType.products, categoryName: currentType.type });
     }
 
     const products = category.products;
-    res.status(200).json({ products });
+    res.status(200).json({ products, categoryName: category.name });
   } catch (err) {
     const error = new Error("Đã có lỗi xảy ra");
     error.statusCode = 500;

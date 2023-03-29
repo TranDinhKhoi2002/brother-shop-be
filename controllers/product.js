@@ -96,26 +96,100 @@ exports.getProductsByKeyword = async (req, res, next) => {
 };
 
 exports.getProductsByFilters = async (req, res, next) => {
-  console.log(req.query.types === "null");
-  if (req.query.types === "null") {
-    return res.status(200).json({ products: null });
+  let products = [];
+
+  if (req.query.types !== "null") {
+    const types = req.query.types.split(",");
+
+    const category = await Category.findOne({ "types.type": types[0] }).populate({
+      path: "types",
+      populate: "products",
+    });
+
+    const categoryTypes = category.types;
+
+    for (const type of types) {
+      const categoryType = categoryTypes.find((item) => item.type === type);
+      products.push(...categoryType.products);
+    }
   }
 
-  const types = req.query.types.split(",");
+  if (req.query.priceFrom !== "null" && req.query.priceTo !== "null") {
+    const priceFrom = +req.query.priceFrom;
+    const priceTo = +req.query.priceTo;
 
-  const products = [];
-  const category = await Category.findOne({ "types.type": types[0] }).populate({ path: "types", populate: "products" });
-
-  const categoryTypes = category.types;
-
-  for (const type of types) {
-    const categoryType = categoryTypes.find((item) => item.type === type);
-    products.push(...categoryType.products);
+    if (req.query.types === "null") {
+      products = await Product.find({ price: { $gte: priceFrom, $lte: priceTo } });
+    } else {
+      products = products.filter((product) => product.price >= priceFrom && product.price <= priceTo);
+    }
   }
+
+  const productsByMaterial = [];
+  const materials = req.query.materials.split(",");
+
+  if (req.query.materials !== "null") {
+    for (const material of materials) {
+      const existingProductsByMaterial = await Product.find({
+        description: {
+          $regex: material,
+          $options: "i",
+        },
+      });
+      productsByMaterial.push(...existingProductsByMaterial);
+    }
+
+    if (req.query.types === "null" && req.query.priceFrom === "null" && req.query.priceTo === "null") {
+      products = [...productsByMaterial];
+    } else {
+      products = products.filter(
+        (product) =>
+          materials.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1
+      );
+    }
+  }
+
+  const productsByTexture = [];
+  const textures = req.query.textures.split(",");
+
+  if (req.query.textures !== "null") {
+    for (const texture of textures) {
+      const existingProductsByTexture = await Product.find({
+        description: {
+          $regex: texture,
+          $options: "i",
+        },
+      });
+      productsByTexture.push(...existingProductsByTexture);
+    }
+
+    if (
+      req.query.types === "null" &&
+      req.query.priceFrom === "null" &&
+      req.query.priceTo === "null" &&
+      req.query.materials === "null"
+    ) {
+      products = [...productsByTexture];
+    } else {
+      products = products.filter(
+        (product) => textures.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1
+      );
+    }
+  }
+
+  if (
+    req.query.types === "null" &&
+    req.query.priceFrom === "null" &&
+    req.query.priceTo === "null" &&
+    req.query.materials === "null" &&
+    req.query.textures === "null"
+  ) {
+    products = null;
+  }
+
+  res.status(200).json({ products });
 
   // try {
 
   // } catch (error) {}
-
-  res.status(200).json({ products, category });
 };

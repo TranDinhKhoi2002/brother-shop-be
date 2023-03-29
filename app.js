@@ -4,15 +4,11 @@ const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const dotenv = require("dotenv");
 
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+dotenv.config();
 
 const corsOptions = {
   origin: "*",
@@ -29,6 +25,7 @@ const paymentRoutes = require("./routes/payment");
 const orderRoutes = require("./routes/order");
 const dataRoutes = require("./routes/data");
 const cartRoutes = require("./routes/cart");
+const wishlistRoutes = require("./routes/wishlist");
 
 app.use("/auth", authRoutes);
 app.use(productRoutes);
@@ -39,21 +36,16 @@ app.use(paymentRoutes);
 app.use(orderRoutes);
 app.use(dataRoutes);
 app.use(cartRoutes);
+app.use(wishlistRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, validationErrors } = err;
   res.status(statusCode || 500).json({ message, validationErrors });
 });
 
-// const { generateData, clearData } = require("./util/fakeData");
-// generateData();
-// clearData();
+const MONGODB_URL = `mongodb+srv://${process.env.MONGODB_USER_NAME}:${process.env.MONGODB_PASSWORD}@cluster0.9srxm.mongodb.net/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`;
 
 mongoose.set("strictQuery", false);
-mongoose
-  .connect(
-    "mongodb+srv://brothershop:1IZiysgtyfNOAdjy@cluster0.9srxm.mongodb.net/brothershop?retryWrites=true&w=majority"
-  )
-  .then(() => {
-    app.listen(3001);
-  });
+mongoose.connect(MONGODB_URL).then(() => {
+  app.listen(3001);
+});

@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const Category = require("../models/category");
+const Customer = require("../models/customer");
 const Event = require("../models/event");
 const { faker } = require("@faker-js/faker");
 
@@ -601,6 +602,16 @@ exports.generateData = async () => {
   //   relatedProducts: trouserProductsIds,
   // });
   // await event.save();
+
+  /**
+   * Add Wishlist property to all documents in Customer collection
+   */
+
+  const customers = await Customer.find();
+  for (const customer of customers) {
+    customer.wishlist = [];
+    await customer.save();
+  }
 };
 
 exports.clearData = async () => {
