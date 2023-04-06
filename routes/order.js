@@ -5,6 +5,6 @@ const orderController = require("../controllers/order");
 
 router.post("/orders/create-order", orderController.createOrder);
 
-router.put("/orders/check-out/:orderId", orderController.checkOutOrder);
+router.put("/orders/check-out", orderController.checkOutOrder);
 
 module.exports = router;

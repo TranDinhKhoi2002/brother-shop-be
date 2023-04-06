@@ -7,6 +7,8 @@ const { signupValidations, forgotPasswordValidations, resetPasswordValidations }
 
 router.post("/login", authController.login);
 
+router.post("/login-with-google", authController.loginWithGoogle);
+
 router.post("/signup", signupValidations, validationErrorHandler, authController.signup);
 
 router.post("/forgot-password", forgotPasswordValidations, validationErrorHandler, authController.forgotPassword);

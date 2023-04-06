@@ -49,6 +49,10 @@ const productSchema = new Schema({
       },
     },
   ],
+  totalSold: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("Product", productSchema);

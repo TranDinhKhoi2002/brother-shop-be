@@ -19,6 +19,7 @@ exports.getProductsByCategory = async (req, res, next) => {
     }
 
     const products = category.products;
+
     res.status(200).json({ products, categoryName: category.name });
   } catch (err) {
     const error = new Error("Đã có lỗi xảy ra");

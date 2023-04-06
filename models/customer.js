@@ -6,7 +6,9 @@ const customerSchema = new Schema({
   account: {
     type: Schema.Types.ObjectId,
     ref: "Account",
-    required: true,
+  },
+  authAccountId: {
+    type: String,
   },
   orders: [
     {

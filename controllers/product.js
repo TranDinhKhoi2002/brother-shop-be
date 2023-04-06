@@ -1,6 +1,7 @@
 const { ITEMS_PER_PAGE } = require("../constants");
 const Category = require("../models/category");
 const Product = require("../models/product");
+const AppError = require("../util/error");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -96,100 +97,55 @@ exports.getProductsByKeyword = async (req, res, next) => {
 };
 
 exports.getProductsByFilters = async (req, res, next) => {
-  let products = [];
-
-  if (req.query.types !== "null") {
-    const types = req.query.types.split(",");
-
-    const category = await Category.findOne({ "types.type": types[0] }).populate({
+  try {
+    const category = await Category.findOne({ "types._id": req.query.categoryId }).populate("products").populate({
       path: "types",
       populate: "products",
     });
-
-    const categoryTypes = category.types;
-
-    for (const type of types) {
-      const categoryType = categoryTypes.find((item) => item.type === type);
-      products.push(...categoryType.products);
+    if (!category) {
+      return res.status(200).json({ products: [] });
     }
-  }
 
-  if (req.query.priceFrom !== "null" && req.query.priceTo !== "null") {
-    const priceFrom = +req.query.priceFrom;
-    const priceTo = +req.query.priceTo;
+    let products = category.products;
 
-    if (req.query.types === "null") {
-      products = await Product.find({ price: { $gte: priceFrom, $lte: priceTo } });
-    } else {
+    if (req.query.types !== "null") {
+      products = [];
+
+      const types = req.query.types.split(",");
+      const categoryTypes = category.types;
+
+      for (const type of types) {
+        const categoryType = categoryTypes.find((item) => item.type === type);
+        products.push(...categoryType.products);
+      }
+    }
+
+    if (req.query.priceFrom !== "null" && req.query.priceTo !== "null") {
+      const priceFrom = +req.query.priceFrom;
+      const priceTo = +req.query.priceTo;
+
       products = products.filter((product) => product.price >= priceFrom && product.price <= priceTo);
     }
-  }
 
-  const productsByMaterial = [];
-  const materials = req.query.materials.split(",");
-
-  if (req.query.materials !== "null") {
-    for (const material of materials) {
-      const existingProductsByMaterial = await Product.find({
-        description: {
-          $regex: material,
-          $options: "i",
-        },
-      });
-      productsByMaterial.push(...existingProductsByMaterial);
-    }
-
-    if (req.query.types === "null" && req.query.priceFrom === "null" && req.query.priceTo === "null") {
-      products = [...productsByMaterial];
-    } else {
+    if (req.query.materials !== "null") {
+      const materials = req.query.materials.split(",");
       products = products.filter(
         (product) =>
           materials.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1
       );
     }
-  }
 
-  const productsByTexture = [];
-  const textures = req.query.textures.split(",");
-
-  if (req.query.textures !== "null") {
-    for (const texture of textures) {
-      const existingProductsByTexture = await Product.find({
-        description: {
-          $regex: texture,
-          $options: "i",
-        },
-      });
-      productsByTexture.push(...existingProductsByTexture);
-    }
-
-    if (
-      req.query.types === "null" &&
-      req.query.priceFrom === "null" &&
-      req.query.priceTo === "null" &&
-      req.query.materials === "null"
-    ) {
-      products = [...productsByTexture];
-    } else {
+    if (req.query.textures !== "null") {
+      const textures = req.query.textures.split(",");
       products = products.filter(
         (product) => textures.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1
       );
     }
+
+    res.status(200).json({ products });
+  } catch (error) {
+    next(new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau"));
   }
-
-  if (
-    req.query.types === "null" &&
-    req.query.priceFrom === "null" &&
-    req.query.priceTo === "null" &&
-    req.query.materials === "null" &&
-    req.query.textures === "null"
-  ) {
-    products = null;
-  }
-
-  res.status(200).json({ products });
-
-  // try {
-
-  // } catch (error) {}
 };
+
+exports.importGoods = async (req, res, next) => {};

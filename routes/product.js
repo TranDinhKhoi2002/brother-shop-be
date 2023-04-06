@@ -17,4 +17,6 @@ router.get("/products/filters", productController.getProductsByFilters);
 
 router.get("/products/:productId", productController.getProductById);
 
+router.post("/products/import-goods", productController.importGoods);
+
 module.exports = router;

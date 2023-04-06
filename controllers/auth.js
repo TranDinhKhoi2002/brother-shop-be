@@ -45,6 +45,43 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.loginWithGoogle = async (req, res, next) => {
+  const { googleId, name, email } = req.body;
+
+  const existingCustomer = await Customer.findOne({ authAccountId: googleId });
+  if (existingCustomer) {
+    return res.status(200).json({ user: existingCustomer });
+  }
+
+  /**
+   * Check if the customer is not found
+   */
+
+  const customer = new Customer({
+    authAccountId: googleId,
+    orders: [],
+    wishlist: [],
+    cart: [],
+    name,
+    address: "",
+    email,
+    phone: "",
+    gender: "Nam",
+    birthday: new Date.now(),
+  });
+  await customer.save();
+
+  const token = jwt.sign(
+    {
+      accountId: googleId,
+    },
+    "secret",
+    { expiresIn: "24h" }
+  );
+
+  res.status(200).json({ user: customer, token: token });
+};
+
 exports.signup = async (req, res, next) => {
   const { name, email, password, phone, address, gender, birthday } = req.body;
 
@@ -74,6 +111,7 @@ exports.signup = async (req, res, next) => {
       account: account._id,
       orders: [],
       cart: [],
+      wishlist: [],
       name,
       address,
       email,

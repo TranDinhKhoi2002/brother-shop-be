@@ -603,14 +603,13 @@ exports.generateData = async () => {
   // });
   // await event.save();
 
-  /**
-   * Add Wishlist property to all documents in Customer collection
-   */
+  const products = await Product.find();
 
-  const customers = await Customer.find();
-  for (const customer of customers) {
-    customer.wishlist = [];
-    await customer.save();
+  for (const product of products) {
+    const totalSold = product.sizes.reduce((total, size) => total + size.sold, 0);
+    console.log(totalSold);
+    product.totalSold = totalSold;
+    await product.save();
   }
 };
 
