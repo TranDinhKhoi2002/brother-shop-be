@@ -2,11 +2,11 @@ const Customer = require("../models/customer");
 const AppError = require("../util/error");
 
 exports.addToWishlist = async (req, res, next) => {
-  const accountId = req.accountId;
+  const customerId = req.customerId;
   const product = req.body.product;
 
   try {
-    const customer = await Customer.findOne({ account: accountId });
+    const customer = await Customer.findById(customerId);
     if (!customer) {
       throw new AppError(404, "Không tìm thấy khách hàng");
     }
@@ -26,11 +26,11 @@ exports.addToWishlist = async (req, res, next) => {
 };
 
 exports.removeFromWishlist = async (req, res, next) => {
-  const accountId = req.accountId;
+  const customerId = req.customerId;
   const productId = req.body.productId;
 
   try {
-    const customer = await Customer.findOne({ account: accountId });
+    const customer = await Customer.findById(customerId);
     if (!customer) {
       throw new AppError(404, "Không tìm thấy khách hàng");
     }

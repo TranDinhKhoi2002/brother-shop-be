@@ -31,13 +31,13 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(
       {
         username: account.username,
-        accountId: account._id.toString(),
+        customerId: customer._id.toString(),
       },
       "secret",
       { expiresIn: "24h" }
     );
 
-    res.status(200).json({ token, accountId: account._id.toString(), user: customer });
+    res.status(200).json({ token, customerId: customer._id.toString(), user: customer });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;
@@ -46,34 +46,27 @@ exports.login = async (req, res, next) => {
 };
 
 exports.loginWithGoogle = async (req, res, next) => {
-  const { googleId, name, email } = req.body;
+  const { name, email } = req.body;
 
-  const existingCustomer = await Customer.findOne({ authAccountId: googleId });
-  if (existingCustomer) {
-    return res.status(200).json({ user: existingCustomer });
+  let customer = await Customer.findOne({ email: email }).populate("account").populate("cart.productId");
+  if (!customer) {
+    customer = new Customer({
+      orders: [],
+      wishlist: [],
+      cart: [],
+      name,
+      address: "",
+      email,
+      phone: "",
+      gender: "Nam",
+      birthday: new Date(),
+    });
+    await customer.save();
   }
-
-  /**
-   * Check if the customer is not found
-   */
-
-  const customer = new Customer({
-    authAccountId: googleId,
-    orders: [],
-    wishlist: [],
-    cart: [],
-    name,
-    address: "",
-    email,
-    phone: "",
-    gender: "Nam",
-    birthday: new Date.now(),
-  });
-  await customer.save();
 
   const token = jwt.sign(
     {
-      accountId: googleId,
+      customerId: customer._id,
     },
     "secret",
     { expiresIn: "24h" }

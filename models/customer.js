@@ -7,9 +7,6 @@ const customerSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Account",
   },
-  authAccountId: {
-    type: String,
-  },
   orders: [
     {
       type: Schema.Types.ObjectId,
@@ -42,7 +39,7 @@ const customerSchema = new Schema({
   },
   address: {
     type: String,
-    required: true,
+    required: this.account ? true : false,
   },
   email: {
     type: String,
@@ -51,6 +48,7 @@ const customerSchema = new Schema({
   phone: {
     type: String,
     required: true,
+    required: this.account ? true : false,
   },
   gender: {
     type: String,
@@ -60,6 +58,11 @@ const customerSchema = new Schema({
   birthday: {
     type: Date,
     required: true,
+  },
+  verified: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
 });
 

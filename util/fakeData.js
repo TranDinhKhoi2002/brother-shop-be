@@ -602,15 +602,11 @@ exports.generateData = async () => {
   //   relatedProducts: trouserProductsIds,
   // });
   // await event.save();
-
-  const products = await Product.find();
-
-  for (const product of products) {
-    const totalSold = product.sizes.reduce((total, size) => total + size.sold, 0);
-    console.log(totalSold);
-    product.totalSold = totalSold;
-    await product.save();
-  }
+  // const customers = await Customer.find();
+  // for (const customer of customers) {
+  //   customer.verified = false;
+  //   await customer.save();
+  // }
 };
 
 exports.clearData = async () => {

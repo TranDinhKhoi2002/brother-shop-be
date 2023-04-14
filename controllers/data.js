@@ -1,26 +1,24 @@
+const jwt = require("jsonwebtoken");
+
 const Customer = require("../models/customer");
 const Category = require("../models/category");
+const AppError = require("../util/error");
 
 exports.getCommonData = async (req, res, next) => {
+  const categories = await Category.find();
+
+  const authHeader = req.get("Authorization");
+  const token = authHeader.split(" ")[1];
+  let decodedToken;
   try {
-    const categories = await Category.find();
-
-    const accountId = req.query.accountId;
-    if (!accountId || accountId === "undefined") {
-      return res.status(200).json({ categories });
-    }
-
-    const customer = await Customer.findOne({ account: accountId }).populate({ path: "cart", populate: "productId" });
-    if (!customer) {
-      const error = new Error("Không tìm thấy khách hàng");
-      error.statusCode = 404;
-      return next(error);
-    }
-
-    res.status(200).json({ categories, customer });
-  } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-    error.statusCode = 500;
-    next(error);
+    decodedToken = jwt.verify(token, "secret");
+  } catch (error) {
+    return res.status(200).json({ categories });
   }
+
+  const customerId = decodedToken.customerId;
+
+  const customer = await Customer.findById(customerId).populate("account").populate("cart.productId");
+
+  res.status(200).json({ categories, customer: customer });
 };

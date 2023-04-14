@@ -2,7 +2,7 @@ const Customer = require("../models/customer");
 const AppError = require("../util/error");
 
 exports.addToCart = async (req, res, next) => {
-  const accountId = req.accountId;
+  const customerId = req.customerId;
   const item = {
     productId: req.body.productId,
     size: req.body.size,
@@ -10,7 +10,7 @@ exports.addToCart = async (req, res, next) => {
   };
 
   try {
-    const customer = await Customer.findOne({ account: accountId }).populate("cart.productId");
+    const customer = await Customer.findById(customerId).populate("cart.productId");
     if (!customer) {
       throw new AppError(404, "Không tìm thấy người dùng");
     }
@@ -37,7 +37,7 @@ exports.addToCart = async (req, res, next) => {
 };
 
 exports.updateQuantity = async (req, res, next) => {
-  const accountId = req.accountId;
+  const customerId = req.customerId;
   const item = {
     productId: req.body.productId,
     size: req.body.size,
@@ -45,7 +45,7 @@ exports.updateQuantity = async (req, res, next) => {
   };
 
   try {
-    const customer = await Customer.findOne({ account: accountId }).populate("cart.productId");
+    const customer = await Customer.findById(customerId).populate("cart.productId");
     if (!customer) {
       throw new AppError(404, "Không tìm thấy người dùng");
     }
@@ -70,14 +70,14 @@ exports.updateQuantity = async (req, res, next) => {
 };
 
 exports.removeCartItem = async (req, res, next) => {
-  const accountId = req.accountId;
+  const customerId = req.customerId;
   const item = {
     productId: req.body.productId,
     size: req.body.size,
   };
 
   try {
-    const customer = await Customer.findOne({ account: accountId }).populate("cart.productId");
+    const customer = await Customer.findById(customerId).populate("cart.productId");
     if (!customer) {
       throw new AppError(404, "Không tìm thấy người dùng");
     }
@@ -100,10 +100,10 @@ exports.removeCartItem = async (req, res, next) => {
 
 exports.removeCartItems = async (req, res, next) => {
   const items = req.body.items;
-  const accountId = req.accountId;
+  const customerId = req.customerId;
 
   try {
-    const customer = await Customer.findOne({ account: accountId }).populate("cart.productId");
+    const customer = await Customer.findById(customerId).populate("cart.productId");
     if (!customer) {
       throw new AppError(404, "Không tìm thấy người dùng");
     }
