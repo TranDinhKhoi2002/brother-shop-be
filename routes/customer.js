@@ -6,4 +6,8 @@ const customerController = require("../controllers/customer");
 
 router.post("/customer/update-profile", isAuth, customerController.updateProfile);
 
+router.post("/customer/verify-phone-number", isAuth, customerController.verifyPhoneNumber);
+
+router.post("/customer/user-is-verified", isAuth, customerController.updateUserIsVerified);
+
 module.exports = router;
