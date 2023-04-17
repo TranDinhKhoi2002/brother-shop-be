@@ -26,19 +26,20 @@ const receiptSchema = new Schema({
         ref: "Product",
         required: true,
       },
-      size: {
-        type: String,
-        required: true,
-      },
+      sizes: [
+        {
+          name: {
+            type: String,
+            enum: sizes,
+            required: true,
+          },
+          quantity: {
+            type: Number,
+            required: true,
+          },
+        },
+      ],
       importPrice: {
-        type: Number,
-        required: true,
-      },
-      sellPrice: {
-        type: Number,
-        required: true,
-      },
-      quantity: {
         type: Number,
         required: true,
       },

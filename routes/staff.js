@@ -4,6 +4,7 @@ const router = express.Router();
 const isAuth = require("../middleware/is-auth");
 const staffController = require("../controllers/staff");
 
-router.post("/staffs/create", isAuth, staffController.createStaff);
+//sửa is Auth
+router.post("/staffs/create", staffController.createStaff);
 
 module.exports = router;
