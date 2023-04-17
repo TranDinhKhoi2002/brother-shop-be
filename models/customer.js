@@ -47,7 +47,6 @@ const customerSchema = new Schema({
   },
   phone: {
     type: String,
-    required: true,
     required: this.account ? true : false,
   },
   gender: {

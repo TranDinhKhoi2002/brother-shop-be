@@ -10,4 +10,6 @@ router.post("/customer/verify-phone-number", isAuth, customerController.verifyPh
 
 router.post("/customer/user-is-verified", isAuth, customerController.updateUserIsVerified);
 
+router.post("/customer/change-password", isAuth, customerController.changePassword);
+
 module.exports = router;

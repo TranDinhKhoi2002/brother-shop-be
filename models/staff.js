@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { roleNames } = require("../constants");
+const { roleNames, genders } = require("../constants");
 const Schema = mongoose.Schema;
 
 const staffSchema = new Schema({

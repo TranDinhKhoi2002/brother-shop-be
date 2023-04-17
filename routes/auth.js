@@ -7,7 +7,7 @@ const { signupValidations, forgotPasswordValidations, resetPasswordValidations }
 
 router.post("/login", authController.login);
 
-router.post("/login-with-google", authController.loginWithGoogle);
+router.post("/login-with-social-media-account", authController.loginWithSocialMediaAccount);
 
 router.post("/signup", signupValidations, validationErrorHandler, authController.signup);
 

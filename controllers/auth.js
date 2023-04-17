@@ -45,34 +45,38 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.loginWithGoogle = async (req, res, next) => {
+exports.loginWithSocialMediaAccount = async (req, res, next) => {
   const { name, email } = req.body;
 
-  let customer = await Customer.findOne({ email: email }).populate("account").populate("cart.productId");
-  if (!customer) {
-    customer = new Customer({
-      orders: [],
-      wishlist: [],
-      cart: [],
-      name,
-      address: "",
-      email,
-      phone: "",
-      gender: "Nam",
-      birthday: new Date(),
-    });
-    await customer.save();
+  try {
+    let customer = await Customer.findOne({ email: email }).populate("account").populate("cart.productId");
+    if (!customer) {
+      customer = new Customer({
+        orders: [],
+        wishlist: [],
+        cart: [],
+        name,
+        address: "",
+        email,
+        phone: "",
+        gender: "Nam",
+        birthday: new Date(),
+      });
+      await customer.save();
+    }
+
+    const token = jwt.sign(
+      {
+        customerId: customer._id,
+      },
+      "secret",
+      { expiresIn: "24h" }
+    );
+
+    res.status(200).json({ user: customer, token: token });
+  } catch (error) {
+    next(new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau"));
   }
-
-  const token = jwt.sign(
-    {
-      customerId: customer._id,
-    },
-    "secret",
-    { expiresIn: "24h" }
-  );
-
-  res.status(200).json({ user: customer, token: token });
 };
 
 exports.signup = async (req, res, next) => {
@@ -170,29 +174,27 @@ exports.forgotPassword = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   const { token, password } = req.body;
 
-  // try {
+  try {
+    const existingAccount = await Account.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
+    if (!existingAccount) {
+      const error = new Error("Yêu cầu không còn hiệu lực");
+      error.statusCode = 404;
+      return next(error);
+    }
 
-  // } catch (err) {
-  //   const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
-  //   error.statusCode = 500;
-  //   next(error);
-  // }
+    const hashedPassword = bcryptjs.hashSync(password, 12);
 
-  const existingAccount = await Account.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } });
-  if (!existingAccount) {
-    const error = new Error("Yêu cầu không còn hiệu lực");
-    error.statusCode = 404;
-    return next(error);
+    existingAccount.password = hashedPassword;
+    existingAccount.resetToken = undefined;
+    existingAccount.resetTokenExpiration = undefined;
+    await existingAccount.save();
+
+    res.status(201).json({ message: "Thay đổi mật khẩu thành công" });
+  } catch (err) {
+    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    error.statusCode = 500;
+    next(error);
   }
-
-  const hashedPassword = bcryptjs.hashSync(password, 12);
-
-  existingAccount.password = hashedPassword;
-  existingAccount.resetToken = undefined;
-  existingAccount.resetTokenExpiration = undefined;
-  await existingAccount.save();
-
-  res.status(201).json({ message: "Thay đổi mật khẩu thành công" });
 };
 
 exports.checkResetToken = async (req, res, next) => {
