@@ -8,8 +8,8 @@ const staffSchema = new Schema({
     ref: "Account",
   },
   role: {
-    type: String,
-    enum: Object.values(roleNames),
+    type: Schema.Types.ObjectId,
+    ref: "Role",
     required: true,
   },
   name: {

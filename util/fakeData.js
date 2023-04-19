@@ -2,10 +2,11 @@ const Product = require("../models/product");
 const Category = require("../models/category");
 const Customer = require("../models/customer");
 const Event = require("../models/event");
+const Role = require("../models/role");
 const { faker } = require("@faker-js/faker");
 
 const { cloudinary } = require("./cloudinary");
-const { sizes } = require("../constants");
+const { sizes, roleNames } = require("../constants");
 
 const products = [
   {
@@ -606,6 +607,13 @@ exports.generateData = async () => {
   // for (const customer of customers) {
   //   customer.verified = false;
   //   await customer.save();
+  // }
+  /**
+   * Create roles
+   */
+  // for (const roleName of Object.values(roleNames)) {
+  //   const role = new Role({ name: roleName });
+  //   await role.save();
   // }
 };
 

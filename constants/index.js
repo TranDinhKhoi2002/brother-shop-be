@@ -22,7 +22,7 @@ const orderPaymentStatuses = {
 
 // Role Names
 const roleNames = {
-  OWNER: "Chủ quán",
+  OWNER: "Chủ cửa hàng",
   MANAGER: "Quản lý",
   STAFF: "Nhân viên",
   CLIENT: "Khách hàng",

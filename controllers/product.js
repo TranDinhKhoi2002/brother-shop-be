@@ -147,5 +147,3 @@ exports.getProductsByFilters = async (req, res, next) => {
     next(new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau"));
   }
 };
-
-exports.importGoods = async (req, res, next) => {};
