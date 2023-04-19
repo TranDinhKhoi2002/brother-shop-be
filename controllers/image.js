@@ -1,18 +1,18 @@
 const { cloudinary } = require("../util/cloudinary");
 
+const AppError = require("../util/error");
+
 exports.getIntroImages = async (req, res, next) => {
   try {
     const { resources } = await cloudinary.search.expression("folder:brothershop/banners/intro").execute();
     if (!resources) {
-      const error = new Error("Không tìm thấy ảnh");
-      error.statusCode = 404;
+      const error = new AppError(404, "Không tìm thấy ảnh");
       return next(error);
     }
 
     res.status(200).json({ images: resources });
-  } catch (err) {
-    const error = new Error("Đã có lỗi xảy ra");
-    error.statusCode = 500;
-    next(error);
+  } catch (error) {
+    const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
+    next(err);
   }
 };

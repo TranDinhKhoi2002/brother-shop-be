@@ -25,7 +25,7 @@ exports.createOrder = async (req, res, next) => {
     companyAddress,
     companyTaxNumber,
     paymentMethod,
-    accountId,
+    customerId,
   } = req.body;
 
   try {
@@ -37,7 +37,6 @@ exports.createOrder = async (req, res, next) => {
       toNote,
       products,
       totalProductsPrice,
-      shippingPrice,
       totalPrice,
       companyName: companyName === "" ? undefined : companyName,
       companyAddress: companyAddress === "" ? undefined : companyAddress,
@@ -76,15 +75,19 @@ exports.createOrder = async (req, res, next) => {
       },
     });
 
-    const customer = await Customer.findOne({ account: accountId });
-    if (customer && paymentMethod === "cod") {
-      customer.cart = [];
-      await customer.save();
+    if (customerId) {
+      const customer = await Customer.findById(customerId);
+      if (customer) {
+        customer.cart = [];
+        customer.orders.push(order._id);
+        await customer.save();
+      }
     }
 
     res.status(200).json({ message: "Đặt hàng thành công", orderId: order._id });
   } catch (error) {
-    next(new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau"));
+    const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
+    next(err);
   }
 };
 
