@@ -7,7 +7,7 @@ const phoneRegEx = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
 const validator = {
   email: body("email").isEmail().withMessage("Email không hợp lệ").normalizeEmail({ gmail_remove_dots: false }),
   name: body("name", "Tên không được để trống").notEmpty().trim(),
-  password: body("password", "Mật khẩu phải có ít nhất 8 ký tự").isLength({ min: 6 }).isAlphanumeric().trim(),
+  password: body("password", "Mật khẩu phải có ít nhất 8 ký tự").isLength({ min: 8 }).isAlphanumeric().trim(),
   confirmPassword: body("confirmPassword").custom((value, { req }) => {
     if (value !== req.body.password) {
       throw new Error("Xác nhận mật khẩu không đúng");

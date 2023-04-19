@@ -76,6 +76,9 @@ exports.updateUserIsVerified = async (req, res, next) => {
     });
     await account.save();
 
+    customer.account = account._id;
+    await customer.save();
+
     const formatedPhoneNumber = "+84" + customer.phone.slice(1);
 
     const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
