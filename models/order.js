@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const { orderShippingStatuses, orderPaymentStatuses } = require("../constants/index");
+const {
+  orderShippingStatuses,
+  orderPaymentStatuses,
+  orderShippingMethods,
+  orderPaymentMethods,
+} = require("../constants/index");
 
 const orderSchema = new Schema(
   {
@@ -61,10 +66,20 @@ const orderSchema = new Schema(
       type: Number,
       required: true,
     },
+    shippingMethod: {
+      type: String,
+      enum: orderShippingMethods,
+      default: orderShippingMethods.FAST_DELIVERY,
+    },
     shippingStatus: {
       type: String,
       enum: orderShippingStatuses,
       default: orderShippingStatuses.PREPARING,
+    },
+    paymentMethod: {
+      type: String,
+      enum: orderPaymentMethods,
+      required: true,
     },
     paymentStatus: {
       type: String,

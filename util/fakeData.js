@@ -3,10 +3,11 @@ const Category = require("../models/category");
 const Customer = require("../models/customer");
 const Event = require("../models/event");
 const Role = require("../models/role");
+const Order = require("../models/order");
 const { faker } = require("@faker-js/faker");
 
 const { cloudinary } = require("./cloudinary");
-const { sizes, roleNames } = require("../constants");
+const { sizes, roleNames, orderShippingMethods, orderPaymentMethods, orderPaymentStatuses } = require("../constants");
 
 const products = [
   {
@@ -615,6 +616,56 @@ exports.generateData = async () => {
   //   const role = new Role({ name: roleName });
   //   await role.save();
   // }
+  /**
+   * Update product state
+   */
+  // const products = await Product.find();
+  // for (const product of products) {
+  //   product.state = "Đang bán";
+  //   await product.save();
+  // }
+  /**
+   * Add shipping and payment method
+   */
+  // const orders = await Order.find();
+  // for (const order of orders) {
+  //   order.shippingMethod = orderShippingMethods.FAST_DELIVERY;
+  //   if (order.paymentStatus === orderPaymentStatuses.PAID) {
+  //     order.paymentMethod = orderPaymentMethods.ONLINE_VNPAY;
+  //   } else {
+  //     order.paymentMethod = orderPaymentMethods.COD;
+  //   }
+  //   await order.save();
+  // }
+
+  /**
+   * Update address to array of addresses
+   */
+
+  const customers = await Customer.find();
+  for (const customer of customers) {
+    customer.address = [
+      {
+        name: "Trần Đình Khôi",
+        phone: "0349175927",
+        city: "Tỉnh Bến Tre",
+        district: "Huyện Ba Tri",
+        ward: "Thị trấn Ba Tri",
+        detail: "35 Lê Tặng KP2 Ba Tri Bến Tre",
+        isDefault: true,
+      },
+      {
+        name: "Trần Tự Cường",
+        phone: "0349175927",
+        city: "Tỉnh Cà Mau",
+        district: "Huyện Năm Căn",
+        ward: "Xã Hàm Rồng",
+        detail: "207 Đường Số 138",
+        isDefault: false,
+      },
+    ];
+    await customer.save();
+  }
 };
 
 exports.clearData = async () => {

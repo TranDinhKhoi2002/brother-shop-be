@@ -8,6 +8,7 @@ const {
   updateProfileValidations,
   verifyPhoneNumberValidations,
   changePasswordValidations,
+  addAddressValidations,
 } = require("../validations/customer");
 
 router.post(
@@ -34,6 +35,14 @@ router.post(
   changePasswordValidations,
   validationErrorHandler,
   customerController.changePassword
+);
+
+router.post(
+  "/customer/add-address",
+  isAuth,
+  addAddressValidations,
+  validationErrorHandler,
+  customerController.addAddress
 );
 
 module.exports = router;

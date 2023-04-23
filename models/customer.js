@@ -37,10 +37,38 @@ const customerSchema = new Schema({
     type: String,
     required: true,
   },
-  address: {
-    type: String,
-    required: this.account ? true : false,
-  },
+  address: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      district: {
+        type: String,
+        required: true,
+      },
+      ward: {
+        type: String,
+        required: true,
+      },
+      detail: {
+        type: String,
+        required: true,
+      },
+      isDefault: {
+        type: Boolean,
+        required: true,
+      },
+    },
+  ],
   email: {
     type: String,
     required: true,

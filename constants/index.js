@@ -5,7 +5,8 @@
 // Product States
 const productStates = {
   ACTIVE: "Đang bán",
-  PAUSE: "Nghỉ bán",
+  PAUSE: "Ngừng bán",
+  OUT_OF_STOCK: "Hết hàng",
 };
 
 const orderShippingStatuses = {
@@ -35,7 +36,7 @@ const genders = {
   OTHER: "Khác",
 };
 
-const userStatus = {
+const staffState = {
   ACTIVE: "Đang làm",
   NONACTIVE: "Đã nghỉ",
 };
@@ -49,13 +50,24 @@ const sizes = {
 
 const ITEMS_PER_PAGE = 12;
 
+const orderShippingMethods = {
+  FAST_DELIVERY: "Giao hàng nhanh",
+};
+
+const orderPaymentMethods = {
+  COD: "Thanh toán khi nhận hàng",
+  ONLINE_VNPAY: "Thanh toán qua VNPay",
+};
+
 module.exports = {
   productStates,
   orderShippingStatuses,
   orderPaymentStatuses,
   roleNames,
   genders,
-  userStatus,
+  staffState,
   sizes,
   ITEMS_PER_PAGE,
+  orderShippingMethods,
+  orderPaymentMethods,
 };

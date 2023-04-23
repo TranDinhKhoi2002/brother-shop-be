@@ -26,7 +26,10 @@ exports.login = async (req, res, next) => {
       return next(error);
     }
 
-    const customer = await Customer.findOne({ account: account._id }).populate("account").populate("cart.productId");
+    const customer = await Customer.findOne({ account: account._id })
+      .populate("account")
+      .populate("cart.productId")
+      .populate("orders");
 
     const token = jwt.sign(
       {
@@ -49,7 +52,10 @@ exports.loginWithSocialMediaAccount = async (req, res, next) => {
   const { name, email } = req.body;
 
   try {
-    let customer = await Customer.findOne({ email: email }).populate("account").populate("cart.productId");
+    let customer = await Customer.findOne({ email: email })
+      .populate("account")
+      .populate("cart.productId")
+      .populate("orders");
     if (!customer) {
       customer = new Customer({
         orders: [],

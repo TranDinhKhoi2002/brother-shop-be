@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { sizes } = require("../constants");
+const { sizes, productStates } = require("../constants");
 const Schema = mongoose.Schema;
 
 const productSchema = new Schema({
@@ -52,6 +52,11 @@ const productSchema = new Schema({
   totalSold: {
     type: Number,
     default: 0,
+  },
+  state: {
+    type: String,
+    enum: Object.values(productStates),
+    default: Object.values(productStates)[0],
   },
 });
 

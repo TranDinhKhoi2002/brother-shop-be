@@ -19,7 +19,10 @@ exports.getCommonData = async (req, res, next) => {
 
     const customerId = decodedToken.customerId;
 
-    const customer = await Customer.findById(customerId).populate("account").populate("cart.productId");
+    const customer = await Customer.findById(customerId)
+      .populate("account")
+      .populate("cart.productId")
+      .populate("orders");
 
     res.status(200).json({ categories, customer: customer });
   } catch (error) {

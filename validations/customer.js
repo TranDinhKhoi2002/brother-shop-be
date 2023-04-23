@@ -14,6 +14,10 @@ const validator = {
     .isAlphanumeric()
     .trim()
     .withMessage("Mật khẩu không hợp lệ"),
+  detail: body("detail", "Vui lòng điền địa chỉ cụ thể").notEmpty().trim(),
+  city: body("city", "Vui lòng chọn tỉnh/thành phố").notEmpty().trim(),
+  district: body("district", "Vui lòng chọn quận/huyện").notEmpty().trim(),
+  ward: body("ward", "Vui lòng chọn phường/xã").notEmpty().trim(),
 };
 
 const updateProfileValidations = [validator.name, validator.phone, validator.birthday, validator.gender];
@@ -22,4 +26,18 @@ const verifyPhoneNumberValidations = [validator.phone];
 
 const changePasswordValidations = [validator.password];
 
-module.exports = { updateProfileValidations, verifyPhoneNumberValidations, changePasswordValidations };
+const addAddressValidations = [
+  validator.name,
+  validator.phone,
+  validator.detail,
+  validator.city,
+  validator.district,
+  validator.ward,
+];
+
+module.exports = {
+  updateProfileValidations,
+  verifyPhoneNumberValidations,
+  changePasswordValidations,
+  addAddressValidations,
+};

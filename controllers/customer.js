@@ -9,22 +9,22 @@ exports.updateProfile = async (req, res, next) => {
   const customerId = req.customerId;
 
   try {
-    const { name, phone, birthday, gender } = req.body;
+    const { name, phoneNumber, birthday, gender } = req.body;
 
-    const customer = await Customer.findById(customerId);
+    const customer = await Customer.findById(customerId).populate("cart.productId").populate("orders");
     if (!customer) {
       throw new AppError(404, "Khách hàng không tồn tại");
     }
 
-    if (phone !== customer.phone) {
-      const existingCustomer = await Customer.findOne({ phone: phone });
+    if (phoneNumber !== customer.phone) {
+      const existingCustomer = await Customer.findOne({ phone: phoneNumber });
       if (existingCustomer) {
         throw new AppError(422, "Số điện thoại đã được sử dụng");
       }
     }
 
     customer.name = name;
-    customer.phone = phone;
+    customer.phone = phoneNumber;
     customer.birthday = birthday;
     customer.gender = gender;
     await customer.save();
@@ -116,4 +116,8 @@ exports.changePassword = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+exports.addAddress = async (req, res, next) => {
+  const { name, phone, detail, city, district, ward } = req.body;
 };
