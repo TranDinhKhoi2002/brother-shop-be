@@ -18,6 +18,7 @@ const validator = {
   city: body("city", "Vui lòng chọn tỉnh/thành phố").notEmpty().trim(),
   district: body("district", "Vui lòng chọn quận/huyện").notEmpty().trim(),
   ward: body("ward", "Vui lòng chọn phường/xã").notEmpty().trim(),
+  _id: body("_id").isMongoId().withMessage("Mã địa chỉ không hợp lệ"),
 };
 
 const updateProfileValidations = [validator.name, validator.phone, validator.birthday, validator.gender];
@@ -35,9 +36,12 @@ const addAddressValidations = [
   validator.ward,
 ];
 
+const editAddressValidations = [...addAddressValidations, validator._id];
+
 module.exports = {
   updateProfileValidations,
   verifyPhoneNumberValidations,
   changePasswordValidations,
   addAddressValidations,
+  editAddressValidations,
 };

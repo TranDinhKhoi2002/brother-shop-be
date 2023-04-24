@@ -65,6 +65,7 @@ const customerSchema = new Schema({
       },
       isDefault: {
         type: Boolean,
+        default: false,
         required: true,
       },
     },

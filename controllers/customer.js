@@ -119,5 +119,54 @@ exports.changePassword = async (req, res, next) => {
 };
 
 exports.addAddress = async (req, res, next) => {
-  const { name, phone, detail, city, district, ward } = req.body;
+  const { name, phoneNumber, detail, city, district, ward } = req.body;
+  const customerId = req.customerId;
+
+  try {
+    const newAddress = {
+      name,
+      phone: phoneNumber,
+      detail,
+      city,
+      district,
+      ward,
+    };
+
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      throw new AppError(404, "Không tìm thấy khách hàng");
+    }
+
+    customer.address.push(newAddress);
+    await customer.save();
+
+    res.status(201).json({ message: "Thêm địa chỉ thành công", updatedAddresses: customer.address });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.editAddress = async (req, res, next) => {
+  const { name, phoneNumber, detail, city, district, ward, _id } = req.body;
+  const customerId = req.customerId;
+
+  const customer = await Customer.findById(customerId);
+  if (!customer) {
+    throw new AppError(404, "Không tìm thấy khách hàng");
+  }
+
+  const existingAddress = customer.address.find((item) => item._id.toString() === _id);
+  if (!existingAddress) {
+    throw new AppError(404, "Địa chỉ không tồn tại");
+  }
+
+  existingAddress.name = name;
+  existingAddress.phone = phoneNumber;
+  existingAddress.detail = detail;
+  existingAddress.city = city;
+  existingAddress.district = district;
+  existingAddress.ward = ward;
+  await customer.save();
+
+  res.status(201).json({ message: "Cập nhật địa chỉ thành công", updatedAddresses: customer.address });
 };
