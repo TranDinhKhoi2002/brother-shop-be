@@ -38,10 +38,16 @@ const addAddressValidations = [
 
 const editAddressValidations = [...addAddressValidations, validator._id];
 
+const removeAddressValidations = [validator._id];
+
+const updateAddressToDefault = [validator._id];
+
 module.exports = {
   updateProfileValidations,
   verifyPhoneNumberValidations,
   changePasswordValidations,
   addAddressValidations,
   editAddressValidations,
+  removeAddressValidations,
+  updateAddressToDefault,
 };

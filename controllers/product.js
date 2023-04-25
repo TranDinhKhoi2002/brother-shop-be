@@ -73,12 +73,12 @@ exports.getProductsByKeyword = async (req, res, next) => {
   const page = +req.query.page || 1;
 
   try {
-    const products = await Product.find({ name: { $regex: keyword, $options: "$i" } })
+    const products = await Product.find({ name: { $regex: keyword, $options: "i" } })
       .populate("category")
       .skip((page - 1) * ITEMS_PER_PAGE)
       .limit(ITEMS_PER_PAGE);
 
-    const totalItems = await Product.find({ name: { $regex: keyword, $options: "$i" } }).countDocuments();
+    const totalItems = await Product.find({ name: { $regex: keyword, $options: "i" } }).countDocuments();
 
     res.status(200).json({
       products,

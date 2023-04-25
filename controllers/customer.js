@@ -150,23 +150,73 @@ exports.editAddress = async (req, res, next) => {
   const { name, phoneNumber, detail, city, district, ward, _id } = req.body;
   const customerId = req.customerId;
 
+  try {
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      throw new AppError(404, "Không tìm thấy khách hàng");
+    }
+
+    const existingAddress = customer.address.find((item) => item._id.toString() === _id);
+    if (!existingAddress) {
+      throw new AppError(404, "Địa chỉ không tồn tại");
+    }
+
+    existingAddress.name = name;
+    existingAddress.phone = phoneNumber;
+    existingAddress.detail = detail;
+    existingAddress.city = city;
+    existingAddress.district = district;
+    existingAddress.ward = ward;
+    await customer.save();
+
+    res.status(201).json({ message: "Cập nhật địa chỉ thành công", updatedAddresses: customer.address });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.removeAddress = async (req, res, next) => {
+  const { _id: addressId } = req.body;
+  const customerId = req.customerId;
+
+  try {
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      throw new AppError(404, "Không tìm thấy khách hàng");
+    }
+
+    const updatedAddresses = customer.address.filter((item) => item._id.toString() !== addressId);
+    customer.address = updatedAddresses;
+    await customer.save();
+
+    res.status(200).json({ message: "Xóa địa chỉ thành công", updatedAddresses: customer.address });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateAddressToDefault = async (req, res, next) => {
+  const { _id: addressId } = req.body;
+  const customerId = req.customerId;
+
   const customer = await Customer.findById(customerId);
   if (!customer) {
     throw new AppError(404, "Không tìm thấy khách hàng");
   }
 
-  const existingAddress = customer.address.find((item) => item._id.toString() === _id);
-  if (!existingAddress) {
-    throw new AppError(404, "Địa chỉ không tồn tại");
-  }
+  const updatedAddresses = [...customer.address];
+  updatedAddresses.forEach((item) => {
+    if (item.isDefault) {
+      item.isDefault = false;
+    }
 
-  existingAddress.name = name;
-  existingAddress.phone = phoneNumber;
-  existingAddress.detail = detail;
-  existingAddress.city = city;
-  existingAddress.district = district;
-  existingAddress.ward = ward;
+    if (item._id.toString() === addressId) {
+      item.isDefault = true;
+    }
+  });
+
+  customer.address = updatedAddresses;
   await customer.save();
 
-  res.status(201).json({ message: "Cập nhật địa chỉ thành công", updatedAddresses: customer.address });
+  res.status(200).json({ message: "Đã đặt địa chỉ thành mặc định", updatedAddresses: customer.address });
 };

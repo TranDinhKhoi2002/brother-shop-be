@@ -10,6 +10,8 @@ const {
   changePasswordValidations,
   addAddressValidations,
   editAddressValidations,
+  removeAddressValidations,
+  updateAddressToDefault,
 } = require("../validations/customer");
 
 router.post(
@@ -52,6 +54,22 @@ router.post(
   editAddressValidations,
   validationErrorHandler,
   customerController.editAddress
+);
+
+router.post(
+  "/customer/remove-address",
+  isAuth,
+  removeAddressValidations,
+  validationErrorHandler,
+  customerController.removeAddress
+);
+
+router.post(
+  "/customer/update-address-to-default",
+  isAuth,
+  updateAddressToDefault,
+  validationErrorHandler,
+  customerController.updateAddressToDefault
 );
 
 module.exports = router;

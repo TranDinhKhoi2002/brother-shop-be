@@ -38,6 +38,7 @@ exports.createOrder = async (req, res, next) => {
       products,
       totalProductsPrice,
       totalPrice,
+      paymentMethod,
       companyName: companyName === "" ? undefined : companyName,
       companyAddress: companyAddress === "" ? undefined : companyAddress,
       companyTaxNumber: companyTaxNumber === "" ? undefined : companyTaxNumber,
