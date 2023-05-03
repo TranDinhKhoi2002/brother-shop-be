@@ -17,7 +17,7 @@ const validator = {
   phone: body("phone").trim().notEmpty().withMessage("Số điện thoại không được để trống").matches(phoneRegEx),
   address: body("address").trim().notEmpty().withMessage("Địa chỉ không được để trống"),
   gender: body("gender").isIn(Object.values(genders)).withMessage("Giới tính không hợp lệ"),
-  birthday: body("birthday", "Ngày sinh không hợp lệ").isDate(),
+  birthday: body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
 };
 
 const signupValidations = [

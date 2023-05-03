@@ -40,7 +40,9 @@ exports.login = async (req, res, next) => {
       { expiresIn: "24h" }
     );
 
-    res.status(200).json({ token, customerId: customer._id.toString(), user: customer });
+    res
+      .status(200)
+      .json({ token, customerId: customer._id.toString(), user: customer, message: "Đăng nhập thành công" });
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;
@@ -116,7 +118,7 @@ exports.signup = async (req, res, next) => {
       cart: [],
       wishlist: [],
       name,
-      address,
+      address: [],
       email,
       phone,
       gender,
