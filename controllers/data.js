@@ -2,19 +2,22 @@ const jwt = require("jsonwebtoken");
 
 const Customer = require("../models/customer");
 const Category = require("../models/category");
-const AppError = require("../util/error");
 
 exports.getCommonData = async (req, res, next) => {
   try {
     const categories = await Category.find();
 
     const authHeader = req.get("Authorization");
+    if (!authHeader) {
+      return res.status(200).json({ categories });
+    }
     const token = authHeader.split(" ")[1];
     let decodedToken;
     try {
       decodedToken = jwt.verify(token, "secret");
     } catch (error) {
-      return res.status(200).json({ categories });
+      error.statusCode = 500;
+      throw error;
     }
 
     const customerId = decodedToken.customerId;
@@ -26,7 +29,6 @@ exports.getCommonData = async (req, res, next) => {
 
     res.status(200).json({ categories, customer: customer });
   } catch (error) {
-    const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
-    next(err);
+    next(error);
   }
 };
