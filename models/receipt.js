@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { sizes } = require("../constants");
 const Schema = mongoose.Schema;
 
 const receiptSchema = new Schema({

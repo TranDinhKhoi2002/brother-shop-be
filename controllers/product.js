@@ -1,4 +1,4 @@
-const { ITEMS_PER_PAGE } = require("../constants");
+const { ITEMS_PER_PAGE, sizes } = require("../constants");
 const Category = require("../models/category");
 const Product = require("../models/product");
 const AppError = require("../util/error");
@@ -145,5 +145,39 @@ exports.getProductsByFilters = async (req, res, next) => {
     res.status(200).json({ products });
   } catch (error) {
     next(new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau"));
+  }
+};
+
+exports.createProduct = async (req, res, next) => {
+  try {
+    const { name, categoryId, price, description, mainImg, subImg } = req.body;
+
+    const categories = await Category.find();
+    const currentCategory = categories.find(
+      (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1
+    );
+
+    if (!currentCategory) {
+      throw new AppError(422, "Mã danh mục không tồn tại");
+    }
+
+    const product = new Product({
+      name,
+      category: categoryId,
+      price,
+      description,
+      images: { mainImg, subImg },
+      sizes: Object.values(sizes).map((size) => ({ name: size, quantity: 0, sold: 0 })),
+    });
+    await product.save();
+
+    const currentTypeIndex = currentCategory.types.findIndex((item) => item._id.toString() === categoryId);
+    currentCategory.types[currentTypeIndex].products.push(product._id);
+    currentCategory.products.push(product._id);
+    await currentCategory.save();
+
+    res.status(201).json({ message: "Tạo sản phẩm thành công", product });
+  } catch (error) {
+    next(error);
   }
 };

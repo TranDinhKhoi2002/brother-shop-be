@@ -5,6 +5,10 @@ const orderController = require("../controllers/order");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 const { createOrderValidations, checkOutOrderValidations } = require("../validations/order");
 
+router.get("/orders", orderController.getOrders);
+
+router.get("/orders/:orderId", orderController.getOrderById);
+
 router.post("/orders/create-order", createOrderValidations, validationErrorHandler, orderController.createOrder);
 
 router.put("/orders/check-out", checkOutOrderValidations, validationErrorHandler, orderController.checkOutOrder);

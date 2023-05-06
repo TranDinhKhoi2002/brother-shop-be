@@ -109,3 +109,28 @@ exports.checkOutOrder = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find().populate("customer").populate("products.product");
+    res.status(200).json({ orders });
+  } catch (error) {
+    const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
+    next(err);
+  }
+};
+
+exports.getOrderById = async (req, res, next) => {
+  const orderId = req.params.orderId;
+
+  try {
+    const order = await Order.findById(orderId).populate("customer").populate("products.product");
+    if (!order) {
+      throw new AppError(404, "Đơn hàng không tồn tại");
+    }
+
+    res.status(200).json({ order });
+  } catch (error) {
+    next(error);
+  }
+};
