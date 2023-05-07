@@ -18,18 +18,12 @@ exports.importGoods = async (req, res, next) => {
         throw new AppError(404, "Sản phẩm không tồn tại");
       }
 
-      if (product.sellPrice < existingProduct.price) {
-        existingProduct.oldPrice = existingProduct.price;
-      } else {
-        existingProduct.oldPrice = undefined;
-      }
-
-      existingProduct.price = product.sellPrice;
-
-      const existingSizeIndex = existingProduct.sizes.findIndex((size) => size.name === product.size);
-      if (existingSizeIndex !== -1) {
-        existingProduct.sizes[existingSizeIndex].quantity += product.quantity;
-      }
+      product.sizes.forEach((size) => {
+        const existingSizeIndex = existingProduct.sizes.findIndex((existingSize) => existingSize.name === size.name);
+        if (existingSizeIndex !== -1) {
+          existingProduct.sizes[existingSizeIndex].quantity += size.quantity;
+        }
+      });
 
       await existingProduct.save();
     }
