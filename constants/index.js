@@ -36,7 +36,7 @@ const genders = {
   OTHER: "Khác",
 };
 
-const staffState = {
+const staffStates = {
   ACTIVE: "Đang làm",
   NONACTIVE: "Đã nghỉ",
 };
@@ -65,7 +65,7 @@ module.exports = {
   orderPaymentStatuses,
   roleNames,
   genders,
-  staffState,
+  staffStates,
   sizes,
   ITEMS_PER_PAGE,
   orderShippingMethods,

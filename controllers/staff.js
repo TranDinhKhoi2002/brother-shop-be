@@ -2,8 +2,10 @@ const bcryptjs = require("bcryptjs");
 const sgMail = require("@sendgrid/mail");
 
 const Staff = require("../models/staff");
-const AppError = require("../util/error");
 const Account = require("../models/account");
+const Role = require("../models/role");
+const AppError = require("../util/error");
+const { staffStates } = require("../constants");
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
@@ -48,6 +50,76 @@ exports.createStaff = async (req, res, next) => {
     });
 
     res.status(201).json({ message: "Thêm nhân viên thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateStaff = async (req, res, next) => {
+  const { role, name, address, email, phone, gender, birthday, staffId } = req.body;
+
+  try {
+    const staff = await Staff.findById(staffId);
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    const existingRole = await Role.findById(role);
+    if (!existingRole) {
+      throw new AppError(404, "Chức vụ không tồn tại");
+    }
+
+    staff.role = role;
+    staff.name = name;
+    staff.address = address;
+    staff.email = email;
+    staff.phone = phone;
+    staff.gender = gender;
+    staff.birthday = birthday;
+    await staff.save();
+
+    res.status(200).json({ message: "Cập nhật nhân viên thành công", updatedStaff: staff });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteStaff = async (req, res, next) => {
+  const staffId = req.body.staffId;
+
+  try {
+    const staff = await Staff.findById(staffId);
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    staff.status = staffStates.NONACTIVE;
+    await staff.save();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getStaffs = async (req, res, next) => {
+  try {
+    const staffs = await Staff.find().populate("role");
+    res.status(200).json({ staffs });
+  } catch (error) {
+    const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
+    next(err);
+  }
+};
+
+exports.getStaffById = async (req, res, next) => {
+  const staffId = req.params.staffId;
+
+  try {
+    const staff = await Staff.findById(staffId).populate("role");
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    res.status(200).json({ staff });
   } catch (error) {
     next(error);
   }

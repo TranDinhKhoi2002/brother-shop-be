@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { roleNames, genders } = require("../constants");
+const { genders, staffStates } = require("../constants");
 const Schema = mongoose.Schema;
 
 const staffSchema = new Schema({
@@ -36,6 +36,11 @@ const staffSchema = new Schema({
   birthday: {
     type: Date,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: staffStates,
+    default: Object.values(staffStates)[0],
   },
 });
 
