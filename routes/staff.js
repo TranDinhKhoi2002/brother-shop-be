@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const isAuth = require("../middleware/is-auth");
+const isAuth = require("../middleware/isCustomerAuth");
 const staffController = require("../controllers/staff");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 const { createStaffValidations } = require("../validations/staff");

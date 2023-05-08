@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const isAuth = require("../middleware/is-auth");
+const isAuth = require("../middleware/isCustomerAuth");
 const wishlistController = require("../controllers/wishlist");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 const { addToWishlistValidations, removeFromWishlistValidations } = require("../validations/wishlist");

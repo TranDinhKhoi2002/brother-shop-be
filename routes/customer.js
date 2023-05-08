@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const isAuth = require("../middleware/is-auth");
+const isCustomerAuth = require("../middleware/isCustomerAuth");
+const isStaffAuth = require("../middleware/isStaffAuth");
 const customerController = require("../controllers/customer");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 const {
@@ -14,9 +15,13 @@ const {
   updateAddressToDefault,
 } = require("../validations/customer");
 
+router.get("/customer", isStaffAuth, customerController.getCustomers);
+
+router.get("/customer/:customerId", isStaffAuth, customerController.getCustomerById);
+
 router.post(
   "/customer/update-profile",
-  isAuth,
+  isCustomerAuth,
   updateProfileValidations,
   validationErrorHandler,
   customerController.updateProfile
@@ -24,17 +29,17 @@ router.post(
 
 router.post(
   "/customer/verify-phone-number",
-  isAuth,
+  isCustomerAuth,
   verifyPhoneNumberValidations,
   validationErrorHandler,
   customerController.verifyPhoneNumber
 );
 
-router.post("/customer/user-is-verified", isAuth, customerController.updateUserIsVerified);
+router.post("/customer/user-is-verified", isCustomerAuth, customerController.updateUserIsVerified);
 
 router.post(
   "/customer/change-password",
-  isAuth,
+  isCustomerAuth,
   changePasswordValidations,
   validationErrorHandler,
   customerController.changePassword
@@ -42,7 +47,7 @@ router.post(
 
 router.post(
   "/customer/add-address",
-  isAuth,
+  isCustomerAuth,
   addAddressValidations,
   validationErrorHandler,
   customerController.addAddress
@@ -50,7 +55,7 @@ router.post(
 
 router.post(
   "/customer/edit-address",
-  isAuth,
+  isCustomerAuth,
   editAddressValidations,
   validationErrorHandler,
   customerController.editAddress
@@ -58,7 +63,7 @@ router.post(
 
 router.post(
   "/customer/remove-address",
-  isAuth,
+  isCustomerAuth,
   removeAddressValidations,
   validationErrorHandler,
   customerController.removeAddress
@@ -66,7 +71,7 @@ router.post(
 
 router.post(
   "/customer/update-address-to-default",
-  isAuth,
+  isCustomerAuth,
   updateAddressToDefault,
   validationErrorHandler,
   customerController.updateAddressToDefault

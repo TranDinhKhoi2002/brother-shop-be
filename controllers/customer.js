@@ -199,24 +199,53 @@ exports.updateAddressToDefault = async (req, res, next) => {
   const { _id: addressId } = req.body;
   const customerId = req.customerId;
 
-  const customer = await Customer.findById(customerId);
-  if (!customer) {
-    throw new AppError(404, "Không tìm thấy khách hàng");
+  try {
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      throw new AppError(404, "Không tìm thấy khách hàng");
+    }
+
+    const updatedAddresses = [...customer.address];
+    updatedAddresses.forEach((item) => {
+      if (item.isDefault) {
+        item.isDefault = false;
+      }
+
+      if (item._id.toString() === addressId) {
+        item.isDefault = true;
+      }
+    });
+
+    customer.address = updatedAddresses;
+    await customer.save();
+
+    res.status(200).json({ message: "Đã đặt địa chỉ thành mặc định", updatedAddresses: customer.address });
+  } catch (error) {
+    next(error);
   }
+};
 
-  const updatedAddresses = [...customer.address];
-  updatedAddresses.forEach((item) => {
-    if (item.isDefault) {
-      item.isDefault = false;
+exports.getCustomers = async (req, res, next) => {
+  try {
+    const customers = await Customer.find().populate("orders").populate("cart.productId");
+    res.status(200).json({ customers });
+  } catch (error) {
+    const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
+    next(err);
+  }
+};
+
+exports.getCustomerById = async (req, res, next) => {
+  const customerId = req.params.customerId;
+
+  try {
+    const customer = await Customer.findById(customerId).populate("orders").populate("cart.productId");
+    if (!customer) {
+      throw new AppError(404, "Khách hàng không tồn tại");
     }
 
-    if (item._id.toString() === addressId) {
-      item.isDefault = true;
-    }
-  });
-
-  customer.address = updatedAddresses;
-  await customer.save();
-
-  res.status(200).json({ message: "Đã đặt địa chỉ thành mặc định", updatedAddresses: customer.address });
+    res.status(200).json({ customer });
+  } catch (error) {
+    next(error);
+  }
 };

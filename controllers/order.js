@@ -115,11 +115,6 @@ exports.deleteOrder = async (req, res, next) => {
   const orderId = req.body.orderId;
 
   try {
-    const staff = await Staff.findById(req.staffId);
-    if (!staff) {
-      throw new AppError(404, "Nhân viên không tồn tại");
-    }
-
     const order = await Order.findById(orderId);
     if (!order) {
       throw new AppError(404, "Đơn hàng không tồn tại");

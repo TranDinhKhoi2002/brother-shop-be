@@ -49,7 +49,7 @@ exports.createCategory = async (req, res, next) => {
       throw new AppError(404, "Nhân viên không tồn tại");
     }
 
-    if (staff.role.name == roleNames.STAFF) {
+    if (staff.role.name === roleNames.STAFF) {
       throw new AppError(401, "Bạn không có quyền tạo danh mục sản phẩm");
     }
 
@@ -77,7 +77,7 @@ exports.updateCategory = async (req, res, next) => {
       throw new AppError(404, "Nhân viên không tồn tại");
     }
 
-    if (staff.role.name == roleNames.STAFF) {
+    if (staff.role.name === roleNames.STAFF) {
       throw new AppError(401, "Bạn không có quyền cập nhật danh mục sản phẩm");
     }
 
@@ -105,7 +105,7 @@ exports.deleteCategory = async (req, res, next) => {
       throw new AppError(404, "Nhân viên không tồn tại");
     }
 
-    if (staff.role.name == roleNames.STAFF) {
+    if (staff.role.name === roleNames.STAFF) {
       throw new AppError(401, "Bạn không có quyền xóa danh mục sản phẩm");
     }
 

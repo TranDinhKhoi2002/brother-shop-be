@@ -1,4 +1,3 @@
-const Staff = require("../models/staff");
 const Product = require("../models/product");
 const Receipt = require("../models/receipt");
 const AppError = require("../util/error");
@@ -7,11 +6,6 @@ exports.importGoods = async (req, res, next) => {
   const { supplier, staff, date, deliver, products } = req.body;
 
   try {
-    const existingStaff = await Staff.findById(staff);
-    if (!existingStaff) {
-      throw new AppError(404, "Nhân viên không tồn tại");
-    }
-
     for (const product of products) {
       const existingProduct = await Product.findById(product.productId);
       if (!existingProduct) {
@@ -47,11 +41,6 @@ exports.updateReceipt = async (req, res, next) => {
   const { supplier, date, deliver, products: updatedProducts, receiptId } = req.body;
 
   try {
-    const existingStaff = await Staff.findById(req.staffId);
-    if (!existingStaff) {
-      throw new AppError(404, "Nhân viên không tồn tại");
-    }
-
     const receipt = await Receipt.findById(receiptId);
     if (!receipt) {
       throw new AppError(404, "Phiếu nhập hàng không tồn tại");
