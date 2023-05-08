@@ -31,8 +31,8 @@ router.put(
 );
 
 router.delete(
-  isStaffAuth,
   "/categories/delete",
+  isStaffAuth,
   deleteCategoryValidations,
   validationErrorHandler,
   categoryController.deleteCategory
