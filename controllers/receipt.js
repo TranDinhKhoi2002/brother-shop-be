@@ -37,7 +37,50 @@ exports.importGoods = async (req, res, next) => {
     });
     await receipt.save();
 
-    res.status(200).json({ message: "Nhập hàng thành công" });
+    res.status(201).json({ message: "Nhập hàng thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateReceipt = async (req, res, next) => {
+  const { supplier, date, deliver, products: updatedProducts, receiptId } = req.body;
+
+  try {
+    const existingStaff = await Staff.findById(req.staffId);
+    if (!existingStaff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    const receipt = await Receipt.findById(receiptId);
+    if (!receipt) {
+      throw new AppError(404, "Phiếu nhập hàng không tồn tại");
+    }
+
+    for (const product of receipt.products) {
+      const existingProduct = await Product.findById(product.productId);
+      if (existingProduct) {
+        for (const size of product.sizes) {
+          const selectedSizeIndex = existingProduct.sizes.findIndex((productSize) => productSize.name === size.name);
+          existingProduct.sizes[selectedSizeIndex].quantity -= size.quantity;
+        }
+
+        for (const size of updatedProducts.sizes) {
+          const selectedSizeIndex = existingProduct.sizes.findIndex((productSize) => productSize.name === size.name);
+          existingProduct.sizes[selectedSizeIndex].quantity += size.quantity;
+        }
+
+        await existingProduct.save();
+      }
+    }
+
+    receipt.supplier = supplier;
+    receipt.date = date;
+    receipt.deliver = deliver;
+    receipt.products = updatedProducts;
+    await receipt.save();
+
+    res.status(200).json({ message: "Cập nhật phiếu nhập hàng thành công", updatedReceipt: receipt });
   } catch (error) {
     next(error);
   }

@@ -34,4 +34,6 @@ const createOrderValidations = [
 
 const checkOutOrderValidations = [validator.orderId];
 
-module.exports = { createOrderValidations, checkOutOrderValidations };
+const deleteOrderValidations = [validator.orderId];
+
+module.exports = { createOrderValidations, checkOutOrderValidations, deleteOrderValidations };

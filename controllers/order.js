@@ -7,6 +7,7 @@ const Product = require("../models/product");
 const AppError = require("../util/error");
 const { orderPaymentStatuses } = require("../constants");
 const { printNumberWithCommas } = require("../util/printNumberWithCommas");
+const Staff = require("../models/staff");
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
@@ -105,6 +106,46 @@ exports.checkOutOrder = async (req, res, next) => {
     await order.save();
 
     res.status(200).json({ message: "Thanh toán đơn hàng thành công", cart: [] });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteOrder = async (req, res, next) => {
+  const orderId = req.body.orderId;
+
+  try {
+    const staff = await Staff.findById(req.staffId);
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new AppError(404, "Đơn hàng không tồn tại");
+    }
+
+    const customer = await Customer.findOne({ orders: orderId });
+    if (!customer) {
+      throw new AppError(404, "Không tìm thấy khách hàng của đơn hàng");
+    }
+
+    const updatedOrders = customer.orders.filter((order) => order.toString() !== orderId);
+    customer.orders = updatedOrders;
+    await customer.save();
+
+    for (const product of order.products) {
+      const existingProduct = await Product.findById(product.product);
+      if (existingProduct) {
+        const selectedSizeIndex = existingProduct.sizes.findIndex((size) => size.name === product.size);
+        existingProduct.sizes[selectedSizeIndex].sold -= product.amount;
+        await existingProduct.save();
+      }
+    }
+
+    await Order.findByIdAndRemove(orderId);
+
+    res.status(200).json({ message: "Xóa đơn hàng thành công" });
   } catch (error) {
     next(error);
   }

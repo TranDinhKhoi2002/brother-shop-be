@@ -1,4 +1,6 @@
+const { roleNames } = require("../constants");
 const Category = require("../models/category");
+const Staff = require("../models/staff");
 const AppError = require("../util/error");
 
 exports.getProductsByCategory = async (req, res, next) => {
@@ -42,6 +44,15 @@ exports.createCategory = async (req, res, next) => {
   const { name, types } = req.body;
 
   try {
+    const staff = await Staff.findById(req.staffId).populate("role");
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    if (staff.role.name == roleNames.STAFF) {
+      throw new AppError(401, "Bạn không có quyền tạo danh mục sản phẩm");
+    }
+
     const formattedTypes = types.map((type) => ({ type, products: [] }));
 
     const category = new Category({
@@ -53,8 +64,7 @@ exports.createCategory = async (req, res, next) => {
 
     res.status(201).json({ message: "Thêm danh mục sản phẩm thành công" });
   } catch (error) {
-    const err = new AppError(500, "Đã có lỗi xảy ra");
-    next(err);
+    next(error);
   }
 };
 
@@ -62,6 +72,15 @@ exports.updateCategory = async (req, res, next) => {
   const { name, types, categoryId } = req.body;
 
   try {
+    const staff = await Staff.findById(req.staffId).populate("role");
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    if (staff.role.name == roleNames.STAFF) {
+      throw new AppError(401, "Bạn không có quyền cập nhật danh mục sản phẩm");
+    }
+
     const category = await Category.findById(categoryId);
     if (!category) {
       throw new AppError(404, "Danh mục không tồn tại");
@@ -81,6 +100,15 @@ exports.deleteCategory = async (req, res, next) => {
   const { categoryId } = req.body;
 
   try {
+    const staff = await Staff.findById(req.staffId).populate("role");
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    if (staff.role.name == roleNames.STAFF) {
+      throw new AppError(401, "Bạn không có quyền xóa danh mục sản phẩm");
+    }
+
     const category = await Category.findById(categoryId);
     if (!category) {
       throw new AppError(404, "Danh mục không tồn tại");

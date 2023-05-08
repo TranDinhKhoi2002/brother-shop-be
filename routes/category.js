@@ -8,16 +8,30 @@ const {
   deleteCategoryValidations,
 } = require("../validations/category");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
+const isStaffAuth = require("../middleware/isStaffAuth");
 
 router.get("/categories", categoryController.getCategories);
 
 router.get("/categories/:categoryId/products", categoryController.getProductsByCategory);
 
-router.post("/categories/create", createCategoryValidations, validationErrorHandler, categoryController.createCategory);
+router.post(
+  "/categories/create",
+  isStaffAuth,
+  createCategoryValidations,
+  validationErrorHandler,
+  categoryController.createCategory
+);
 
-router.put("/categories/update", updateCategoryValidations, validationErrorHandler, categoryController.updateCategory);
+router.put(
+  "/categories/update",
+  isStaffAuth,
+  updateCategoryValidations,
+  validationErrorHandler,
+  categoryController.updateCategory
+);
 
 router.delete(
+  isStaffAuth,
   "/categories/delete",
   deleteCategoryValidations,
   validationErrorHandler,
