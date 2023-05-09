@@ -18,6 +18,7 @@ const validator = {
   address: body("address").trim().notEmpty().withMessage("Địa chỉ không được để trống"),
   gender: body("gender").isIn(Object.values(genders)).withMessage("Giới tính không hợp lệ"),
   birthday: body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
+  username: body("username", "Tên đăng nhập không hợp lệ").notEmpty().trim(),
 };
 
 const signupValidations = [
@@ -31,7 +32,7 @@ const signupValidations = [
   validator.birthday,
 ];
 
-const loginValidations = [validator.email];
+const loginValidations = [validator.username, validator.password];
 
 const forgotPasswordValidations = [validator.email];
 

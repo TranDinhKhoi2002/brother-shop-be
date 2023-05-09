@@ -5,6 +5,8 @@ const sgMail = require("@sendgrid/mail");
 
 const Account = require("../models/account");
 const Customer = require("../models/customer");
+const Staff = require("../models/staff");
+const AppError = require("../util/error");
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
@@ -218,6 +220,32 @@ exports.checkResetToken = async (req, res, next) => {
   } catch (err) {
     const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
     error.statusCode = 500;
+    next(error);
+  }
+};
+
+exports.staffLogin = async (req, res, next) => {
+  const { username, password } = req.body;
+
+  try {
+    const account = await Account.findOne({ username });
+    if (!account) {
+      throw new AppError(401, "Tên đăng nhập không tồn tại");
+    }
+
+    const isValidPassword = bcryptjs.compareSync(password, account.password);
+    if (!isValidPassword) {
+      throw new AppError(401, "Mật khẩu không đúng");
+    }
+
+    const staff = await Staff.findOne({ account: account._id }).populate("role");
+
+    const token = jwt.sign({ username: account.username, staffId: staff._id.toString() }, "secret", {
+      expiresIn: "24h",
+    });
+
+    res.status(200).json({ token, staff, message: "Đăng nhập thành công" });
+  } catch (error) {
     next(error);
   }
 };
