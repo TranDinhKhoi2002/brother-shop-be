@@ -11,7 +11,7 @@ const validator = {
   email: body("email").isEmail().withMessage("Email không hợp lệ").normalizeEmail({ gmail_remove_dots: false }),
   phone: body("phone").trim().notEmpty().withMessage("Số điện thoại không được để trống").matches(phoneRegEx),
   gender: body("gender").isIn(Object.values(genders)).withMessage("Giới tính không hợp lệ"),
-  birthday: body("birthday", "Ngày sinh không hợp lệ").isDate(),
+  birthday: body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
   staffId: body("staffId").isMongoId().withMessage("Mã nhân viên không hợp lệ"),
 };
 
