@@ -95,6 +95,8 @@ exports.deleteStaff = async (req, res, next) => {
 
     staff.status = staffStates.NONACTIVE;
     await staff.save();
+
+    res.status(200).json({ message: "Xóa nhân viên thành công" });
   } catch (error) {
     next(error);
   }

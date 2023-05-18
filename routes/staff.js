@@ -14,12 +14,6 @@ router.post("/staffs/create", isStaffAuth, createStaffValidations, validationErr
 
 router.put("/staffs/update", isStaffAuth, updateStaffValidations, validationErrorHandler, staffController.updateStaff);
 
-router.delete(
-  "/staffs/delete",
-  isStaffAuth,
-  deleteStaffValidations,
-  validationErrorHandler,
-  staffController.deleteStaff
-);
+router.post("/staffs/delete", isStaffAuth, deleteStaffValidations, validationErrorHandler, staffController.deleteStaff);
 
 module.exports = router;
