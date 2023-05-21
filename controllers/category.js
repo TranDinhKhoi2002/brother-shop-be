@@ -89,21 +89,27 @@ exports.updateCategory = async (req, res, next) => {
     category.name = name;
 
     if (types.length < category.types.length) {
-      category.types = category.types.filter((item) => types.includes(item.type));
+      const updatedTypes = category.types.filter(
+        (item) => types.findIndex((type) => type._id === item._id.toString()) !== -1
+      );
+      category.types = updatedTypes;
     }
 
     types.forEach((type, index) => {
-      const existingTypeIndex = category.types.findIndex((item) => item.type === type);
-
-      if (existingTypeIndex !== -1) {
-        category.types[existingTypeIndex].type = type;
-      } else {
+      if (type._id === undefined) {
         category.types.push({
-          type: type,
+          type: type.type,
           products: [],
         });
+      } else {
+        const existingTypeIndex = category.types.findIndex((item) => item._id.toString() === type._id);
+        if (existingTypeIndex !== -1) {
+          category.types[existingTypeIndex].type = type.type;
+        }
       }
     });
+
+    console.log(category.types);
     await category.save();
 
     res.status(200).json({ message: "Cập nhật danh mục sản phẩm thành công", updatedCategory: category });
