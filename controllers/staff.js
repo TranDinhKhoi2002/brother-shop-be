@@ -56,7 +56,7 @@ exports.createStaff = async (req, res, next) => {
 };
 
 exports.updateStaff = async (req, res, next) => {
-  const { role, name, address, email, phone, gender, birthday, staffId } = req.body;
+  const { role, name, address, email, phone, gender, birthday, staffId, status } = req.body;
 
   try {
     const staff = await Staff.findById(staffId);
@@ -76,6 +76,7 @@ exports.updateStaff = async (req, res, next) => {
     staff.phone = phone;
     staff.gender = gender;
     staff.birthday = birthday;
+    staff.status = status;
     await staff.save();
 
     res.status(200).json({ message: "Cập nhật nhân viên thành công", updatedStaff: staff });

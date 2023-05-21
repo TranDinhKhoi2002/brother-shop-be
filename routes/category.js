@@ -30,7 +30,7 @@ router.put(
   categoryController.updateCategory
 );
 
-router.delete(
+router.post(
   "/categories/delete",
   isStaffAuth,
   deleteCategoryValidations,

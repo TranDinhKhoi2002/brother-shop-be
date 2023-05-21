@@ -16,7 +16,6 @@ const validator = {
   totalProductsPrice: body("totalProductsPrice").isNumeric().withMessage("Tổng tiền sản phẩm phải là số"),
   shippingPrice: body("shippingPrice").isNumeric().withMessage("Phí vận chuyển phải là số"),
   totalPrice: body("totalPrice").isNumeric().withMessage("Tổng tiền đơn hàng phải là số"),
-  customerId: body("customerId").isMongoId().withMessage("Mã khách hàng không hợp lệ"),
   orderId: body("orderId").isMongoId().withMessage("Mã đơn hàng không hợp lệ"),
 };
 
@@ -29,7 +28,6 @@ const createOrderValidations = [
   validator.totalProductsPrice,
   validator.shippingPrice,
   validator.totalPrice,
-  validator.customerId,
 ];
 
 const checkOutOrderValidations = [validator.orderId];

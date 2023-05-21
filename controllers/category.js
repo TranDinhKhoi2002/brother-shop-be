@@ -87,7 +87,23 @@ exports.updateCategory = async (req, res, next) => {
     }
 
     category.name = name;
-    category.types = types;
+
+    if (types.length < category.types.length) {
+      category.types = category.types.filter((item) => types.includes(item.type));
+    }
+
+    types.forEach((type, index) => {
+      const existingTypeIndex = category.types.findIndex((item) => item.type === type);
+
+      if (existingTypeIndex !== -1) {
+        category.types[existingTypeIndex].type = type;
+      } else {
+        category.types.push({
+          type: type,
+          products: [],
+        });
+      }
+    });
     await category.save();
 
     res.status(200).json({ message: "Cập nhật danh mục sản phẩm thành công", updatedCategory: category });
@@ -119,6 +135,8 @@ exports.deleteCategory = async (req, res, next) => {
     }
 
     await Category.findByIdAndRemove(categoryId);
+
+    res.status(200).json({ message: "Xóa danh mục thành công" });
   } catch (error) {
     next(error);
   }
