@@ -19,11 +19,6 @@ router.get("/products/filters", productController.getProductsByFilters);
 
 router.get("/products/:productId", productController.getProductById);
 
-router.post(
-  "/products/create-product",
-  createProductValidations,
-  validationErrorHandler,
-  productController.createProduct
-);
+router.post("/products/create", createProductValidations, validationErrorHandler, productController.createProduct);
 
 module.exports = router;

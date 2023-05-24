@@ -1,6 +1,7 @@
 const { ITEMS_PER_PAGE, sizes } = require("../constants");
 const Category = require("../models/category");
 const Product = require("../models/product");
+const { cloudinary } = require("../util/cloudinary");
 const AppError = require("../util/error");
 
 exports.getProducts = async (req, res, next) => {
@@ -150,7 +151,33 @@ exports.getProductsByFilters = async (req, res, next) => {
 
 exports.createProduct = async (req, res, next) => {
   try {
-    const { name, categoryId, price, description, mainImg, subImg } = req.body;
+    const { name, categoryId, price, description, mainImg, subImg, mainFolder, subFolder } = req.body;
+
+    const mainImgResponse = cloudinary.uploader.upload(mainImg, {
+      folder: mainFolder,
+    });
+
+    const subImgResponse = cloudinary.uploader.upload(subImg, {
+      folder: subFolder,
+    });
+
+    const [mainImgResult, subImgResult] = await Promise.all([mainImgResponse, subImgResponse]);
+
+    const product = new Product({
+      name,
+      category: categoryId,
+      price,
+      description,
+      images: { mainImg: mainImgResult.public_id, subImg: subImgResult.public_id },
+      sizes: Object.values(sizes).map((size) => ({ name: size, quantity: 0, sold: 0 })),
+    });
+    await product.save();
+
+    const categoryWithNoTypes = await Category.findById(categoryId);
+    if (categoryWithNoTypes) {
+      categoryWithNoTypes.products.push(product._id);
+      return res.status(201).json({ message: "Tạo sản phẩm thành công", product });
+    }
 
     const categories = await Category.find();
     const currentCategory = categories.find(
@@ -160,16 +187,6 @@ exports.createProduct = async (req, res, next) => {
     if (!currentCategory) {
       throw new AppError(422, "Mã danh mục không tồn tại");
     }
-
-    const product = new Product({
-      name,
-      category: categoryId,
-      price,
-      description,
-      images: { mainImg, subImg },
-      sizes: Object.values(sizes).map((size) => ({ name: size, quantity: 0, sold: 0 })),
-    });
-    await product.save();
 
     const currentTypeIndex = currentCategory.types.findIndex((item) => item._id.toString() === categoryId);
     currentCategory.types[currentTypeIndex].products.push(product._id);
