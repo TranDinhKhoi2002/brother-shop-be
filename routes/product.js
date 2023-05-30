@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const productController = require("../controllers/product");
-const { createProductValidations } = require("../validations/product");
+const { createProductValidations, updateProductValidations } = require("../validations/product");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 
 router.get("/products", productController.getProducts);
@@ -20,5 +20,7 @@ router.get("/products/filters", productController.getProductsByFilters);
 router.get("/products/:productId", productController.getProductById);
 
 router.post("/products/create", createProductValidations, validationErrorHandler, productController.createProduct);
+
+router.put("/products/:productId", updateProductValidations, validationErrorHandler, productController.updateProduct);
 
 module.exports = router;

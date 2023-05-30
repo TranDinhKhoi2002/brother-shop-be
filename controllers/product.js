@@ -19,7 +19,7 @@ exports.getProductById = async (req, res, next) => {
   const productId = req.params.productId;
 
   try {
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate("category");
     if (!product) {
       const error = new Error("Không tìm thấy sản phẩm");
       error.statusCode = 404;
@@ -163,9 +163,23 @@ exports.createProduct = async (req, res, next) => {
 
     const [mainImgResult, subImgResult] = await Promise.all([mainImgResponse, subImgResponse]);
 
+    let category;
+
+    category = await Category.findById(categoryId);
+    if (!category) {
+      const categories = await Category.find();
+      category = categories.find(
+        (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1
+      );
+
+      if (!category) {
+        throw new AppError(422, "Mã danh mục không tồn tại");
+      }
+    }
+
     const product = new Product({
       name,
-      category: categoryId,
+      category: category._id,
       price,
       description,
       images: { mainImg: mainImgResult.public_id, subImg: subImgResult.public_id },
@@ -173,25 +187,14 @@ exports.createProduct = async (req, res, next) => {
     });
     await product.save();
 
-    const categoryWithNoTypes = await Category.findById(categoryId);
-    if (categoryWithNoTypes) {
-      categoryWithNoTypes.products.push(product._id);
-      return res.status(201).json({ message: "Tạo sản phẩm thành công", product });
+    category.products.push(product._id);
+
+    if (category.types.length > 0) {
+      const currentTypeIndex = category.types.findIndex((item) => item._id.toString() === categoryId);
+      category.types[currentTypeIndex].products.push(product._id);
     }
 
-    const categories = await Category.find();
-    const currentCategory = categories.find(
-      (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1
-    );
-
-    if (!currentCategory) {
-      throw new AppError(422, "Mã danh mục không tồn tại");
-    }
-
-    const currentTypeIndex = currentCategory.types.findIndex((item) => item._id.toString() === categoryId);
-    currentCategory.types[currentTypeIndex].products.push(product._id);
-    currentCategory.products.push(product._id);
-    await currentCategory.save();
+    await category.save();
 
     res.status(201).json({ message: "Tạo sản phẩm thành công", product });
   } catch (error) {
@@ -199,4 +202,90 @@ exports.createProduct = async (req, res, next) => {
   }
 };
 
-exports.updateProduct = async (req, res, next) => {};
+exports.updateProduct = async (req, res, next) => {
+  const productId = req.params.productId;
+  const { name, description, price, oldPrice, categoryId, mainImg, subImg, mainFolder, subFolder } = req.body;
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new AppError("Sản phẩm không tồn tại");
+    }
+
+    /**
+     * Handle uploading images
+     */
+    if (mainImg) {
+      const splitedMainImgPath = product.images.mainImg.split("/");
+      const mainImgPublicId = splitedMainImgPath[splitedMainImgPath.length - 1];
+      await cloudinary.uploader.destroy(mainImgPublicId);
+
+      const newMainImg = await cloudinary.uploader.upload(mainImg, {
+        folder: mainFolder,
+      });
+      product.images.mainImg = newMainImg.public_id;
+    }
+
+    if (subImg) {
+      const splitedSubImgPath = product.images.subImg.split("/");
+      const subImgPublicId = splitedSubImgPath[splitedSubImgPath.length - 1];
+      await cloudinary.uploader.destroy(subImgPublicId);
+
+      const newSubImg = await cloudinary.uploader.upload(subImg, {
+        folder: subFolder,
+      });
+      product.images.subImg = newSubImg.public_id;
+    }
+
+    /**
+     * Handle pulling and pushing products in categories
+     */
+    if (categoryId !== undefined) {
+      const oldCategory = await Category.findById(product.category);
+      oldCategory.products.pull(product._id);
+
+      if (oldCategory.types.length > 0) {
+        const currentTypeIndex = oldCategory.types.findIndex(
+          (item) => item.products.findIndex((productId) => productId.toString() === product._id.toString()) !== -1
+        );
+        oldCategory.types[currentTypeIndex].products = oldCategory.types[currentTypeIndex].products.filter(
+          (productId) => productId.toString() !== product._id.toString()
+        );
+      }
+      await oldCategory.save();
+
+      const categories = await Category.find();
+      let newCategory = categories.find(
+        (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1
+      );
+      if (!newCategory) {
+        newCategory = await Category.findById(categoryId);
+      }
+
+      newCategory.products.push(product._id);
+
+      if (newCategory.types.length > 0) {
+        const currentTypeIndex = newCategory.types.findIndex((item) => item._id.toString() === categoryId);
+        newCategory.types[currentTypeIndex].products.push(product._id);
+      }
+      await newCategory.save();
+
+      product.category = newCategory._id;
+    }
+
+    /**
+     * Update product details
+     */
+    product.name = name;
+    product.description = description;
+    product.price = price;
+    if (oldPrice) {
+      product.oldPrice = oldPrice;
+    }
+    await product.save();
+
+    res.status(200).json({ message: "Cập nhật sản phẩm thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
