@@ -23,4 +23,8 @@ router.post("/products/create", createProductValidations, validationErrorHandler
 
 router.put("/products/:productId", updateProductValidations, validationErrorHandler, productController.updateProduct);
 
+router.delete("/products/:productId", productController.stopSelling);
+
+router.put("/products/resell/:productId", productController.resellProduct);
+
 module.exports = router;

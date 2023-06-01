@@ -1,4 +1,4 @@
-const { ITEMS_PER_PAGE, sizes } = require("../constants");
+const { ITEMS_PER_PAGE, sizes, productStates } = require("../constants");
 const Category = require("../models/category");
 const Product = require("../models/product");
 const { cloudinary } = require("../util/cloudinary");
@@ -285,6 +285,42 @@ exports.updateProduct = async (req, res, next) => {
     await product.save();
 
     res.status(200).json({ message: "Cập nhật sản phẩm thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.stopSelling = async (req, res, next) => {
+  const productId = req.params.productId;
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new AppError(404, "Sản phẩm không tồn tại");
+    }
+
+    product.state = productStates.PAUSE;
+    await product.save();
+
+    res.status(200).json({ message: "Sản phẩm đã được ngừng bán" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.resellProduct = async (req, res, next) => {
+  const productId = req.params.productId;
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new AppError(404, "Sản phẩm không tồn tại");
+    }
+
+    product.state = productStates.ACTIVE;
+    await product.save();
+
+    res.status(200).json({ message: "Sản phẩm đã được bán lại" });
   } catch (error) {
     next(error);
   }
