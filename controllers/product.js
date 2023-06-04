@@ -3,6 +3,7 @@ const Category = require("../models/category");
 const Product = require("../models/product");
 const { cloudinary } = require("../util/cloudinary");
 const AppError = require("../util/error");
+const io = require("../socket");
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -195,6 +196,8 @@ exports.createProduct = async (req, res, next) => {
     }
 
     await category.save();
+
+    io.getIO().emit("products", { action: "create", product: product });
 
     res.status(201).json({ message: "Tạo sản phẩm thành công", product });
   } catch (error) {

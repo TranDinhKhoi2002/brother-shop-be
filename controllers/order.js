@@ -7,7 +7,6 @@ const Product = require("../models/product");
 const AppError = require("../util/error");
 const { orderPaymentStatuses } = require("../constants");
 const { printNumberWithCommas } = require("../util/printNumberWithCommas");
-const Staff = require("../models/staff");
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 

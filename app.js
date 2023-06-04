@@ -56,6 +56,14 @@ app.use((err, req, res, next) => {
 const MONGODB_URL = `mongodb+srv://${process.env.MONGODB_USER_NAME}:${process.env.MONGODB_PASSWORD}@cluster0.9srxm.mongodb.net/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`;
 
 mongoose.set("strictQuery", false);
-mongoose.connect(MONGODB_URL).then(() => {
-  app.listen(3001);
-});
+mongoose
+  .connect(MONGODB_URL)
+  .then(() => {
+    const server = app.listen(3001);
+    const io = require("./socket").init(server);
+
+    io.on("connection", (socket) => {
+      console.log("Client connected");
+    });
+  })
+  .catch((err) => console.log(err));
