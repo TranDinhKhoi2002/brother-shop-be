@@ -327,6 +327,8 @@ exports.resellProduct = async (req, res, next) => {
     product.state = productStates.ACTIVE;
     await product.save();
 
+    io.getIO().emit("products", { action: "resell", productId: product._id.toString() });
+
     res.status(200).json({ message: "Sản phẩm đã được bán lại" });
   } catch (error) {
     next(error);
