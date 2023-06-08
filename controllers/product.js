@@ -287,6 +287,8 @@ exports.updateProduct = async (req, res, next) => {
     }
     await product.save();
 
+    io.getIO().emit("products", { action: "edit", updatedProduct: product });
+
     res.status(200).json({ message: "Cập nhật sản phẩm thành công" });
   } catch (error) {
     next(error);
@@ -304,6 +306,8 @@ exports.stopSelling = async (req, res, next) => {
 
     product.state = productStates.PAUSE;
     await product.save();
+
+    io.getIO().emit("products", { action: "delete", productId: product._id.toString() });
 
     res.status(200).json({ message: "Sản phẩm đã được ngừng bán" });
   } catch (error) {
