@@ -8,6 +8,8 @@ module.exports = {
       cors: {
         origin: "https://brother-shop.vercel.app/",
         methods: ["GET", "POST", "PUT"],
+        allowedHeaders: ["my-custom-header"],
+        credentials: true,
       },
     });
     return io;
