@@ -7,6 +7,7 @@ const Product = require("../models/product");
 const AppError = require("../util/error");
 const { orderPaymentStatuses } = require("../constants");
 const { printNumberWithCommas } = require("../util/printNumberWithCommas");
+const io = require("../socket");
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
@@ -45,11 +46,21 @@ exports.createOrder = async (req, res, next) => {
     });
     await order.save();
 
+    const productSizes = [];
+
     for (const item of order.products) {
       const existingProduct = await Product.findById(item.product);
       if (existingProduct) {
         const selectedSizeIndex = existingProduct.sizes.findIndex((size) => size.name === item.size);
         existingProduct.sizes[selectedSizeIndex].sold += item.amount;
+
+        productSizes.push({
+          productId: existingProduct._id.toString(),
+          sizes: existingProduct.sizes.map((size) => ({
+            name: size.name,
+            remainingQuantity: size.quantity - size.sold,
+          })),
+        });
         await existingProduct.save();
       }
     }
@@ -84,6 +95,8 @@ exports.createOrder = async (req, res, next) => {
         await customer.save();
       }
     }
+
+    io.getIO().emit("orders", { action: "create", productSizes });
 
     res.status(200).json({ message: "Đặt hàng thành công", orderId: order._id });
   } catch (error) {
