@@ -16,4 +16,6 @@ router.put("/orders/check-out", checkOutOrderValidations, validationErrorHandler
 
 router.delete("/orders", isStaffAuth, deleteOrderValidations, validationErrorHandler, orderController.deleteOrder);
 
+router.put("/orders/:orderId/status", isStaffAuth, orderController.updateOrderStatus);
+
 module.exports = router;

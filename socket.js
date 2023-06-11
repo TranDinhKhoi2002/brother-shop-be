@@ -6,7 +6,7 @@ module.exports = {
   init: (httpServer) => {
     io = require("socket.io")(httpServer, {
       cors: {
-        origin: "https://brother-shop.vercel.app",
+        origin: "*",
         allowedHeaders: ["my-custom-header"],
         credentials: true,
       },

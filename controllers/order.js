@@ -182,3 +182,26 @@ exports.getOrderById = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updateOrderStatus = async (req, res, next) => {
+  const orderId = req.params.orderId;
+  const status = req.body.status;
+
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new AppError(404, "Đơn hàng không tồn tại");
+    }
+
+    order.shippingStatus = status;
+    await order.save();
+
+    io.getIO().emit("orders", { action: "edit", orderId, orderStatus: status });
+
+    res
+      .status(200)
+      .json({ message: "Cập nhật đơn hàng thành công", orderId: order._id.toString(), orderStatus: status });
+  } catch (error) {
+    next(error);
+  }
+};
