@@ -138,6 +138,7 @@ exports.signup = async (req, res, next) => {
 
 exports.forgotPassword = async (req, res, next) => {
   const email = req.body.email;
+  const isCustomer = req.body.isCustomer;
 
   crypto.randomBytes(32, async (err, buffer) => {
     if (err) {
@@ -146,12 +147,24 @@ exports.forgotPassword = async (req, res, next) => {
 
     const token = buffer.toString("hex");
     try {
-      const customer = await Customer.findOne({ email });
-      if (!customer) {
-        return res.status(404).json({ message: "Email không tồn tại" });
+      let accountId;
+      if (isCustomer) {
+        const customer = await Customer.findOne({ email });
+        if (!customer) {
+          return res.status(404).json({ message: "Email không tồn tại" });
+        }
+
+        accountId = customer.account;
+      } else {
+        const staff = await Staff.findOne({ email });
+        if (!staff) {
+          return res.status(404).json({ message: "Email không tồn tại" });
+        }
+
+        accountId = staff.account;
       }
 
-      const account = await Account.findById(customer.account);
+      const account = await Account.findById(accountId);
       if (!account) {
         return res.status(404).json({ message: "Tài khoản không tồn tại" });
       }
@@ -166,6 +179,7 @@ exports.forgotPassword = async (req, res, next) => {
         templateId: process.env.SG_RESET_PASSWORD_TEMPLATE_ID,
         dynamicTemplateData: {
           token: token,
+          url: isCustomer ? "https://brother-shop.vercel.app" : "http://localhost:3000",
         },
       });
 
