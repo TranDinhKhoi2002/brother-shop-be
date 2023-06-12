@@ -242,7 +242,9 @@ exports.staffLogin = async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
-    const account = await Account.findOne({ username });
+    const staff = await Staff.findOne({ email: username }).populate("role");
+
+    const account = await Account.findById(staff.account);
     if (!account) {
       throw new AppError(401, "Tên đăng nhập không tồn tại");
     }
@@ -251,8 +253,6 @@ exports.staffLogin = async (req, res, next) => {
     if (!isValidPassword) {
       throw new AppError(401, "Mật khẩu không đúng");
     }
-
-    const staff = await Staff.findOne({ account: account._id }).populate("role");
 
     const token = jwt.sign({ username: account.username, staffId: staff._id.toString() }, "secret", {
       expiresIn: "24h",
