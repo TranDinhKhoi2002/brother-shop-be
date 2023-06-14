@@ -32,6 +32,7 @@ const customerRoutes = require("./routes/customer");
 const staffRoutes = require("./routes/staff");
 const receiptRoutes = require("./routes/receipt");
 const dashboardRoutes = require("./routes/dashboard");
+const promotionRoutes = require("./routes/promotion");
 
 app.use("/auth", authRoutes);
 app.use(productRoutes);
@@ -47,6 +48,7 @@ app.use(customerRoutes);
 app.use(staffRoutes);
 app.use(receiptRoutes);
 app.use(dashboardRoutes);
+app.use(promotionRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode, message, validationErrors } = err;

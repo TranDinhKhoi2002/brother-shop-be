@@ -51,3 +51,49 @@ exports.createPromotion = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.editPromotion = async (req, res, next) => {
+  const { name, categories, percentage, startDate, endDate } = req.body;
+  const promotionId = req.params.promotionId;
+
+  try {
+    const promotion = await Promotion.findById(promotionId);
+    if (!promotion) {
+      throw new AppError(404, "Khuyến mãi không tồn tại");
+    }
+
+    for (const categoryId of categories) {
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        throw new AppError(404, "Danh mục sản phẩm không tồn tại");
+      }
+    }
+
+    promotion.name = name;
+    promotion.categories = categories;
+    promotion.percentage = percentage;
+    promotion.startDate = startDate;
+    promotion.endDate = endDate;
+    await promotion.save();
+
+    res.status(200).json({ message: "Cập nhật khuyến mãi thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deletePromotion = async (req, res, next) => {
+  const promotionId = req.params.promotionId;
+
+  try {
+    const promotion = await Promotion.findById(promotionId);
+    if (!promotion) {
+      throw new AppError(404, "Khuyến mãi không tồn tại");
+    }
+
+    await Promotion.findByIdAndDelete(promotionId);
+    res.status(200).json({ message: "Xóa khuyến mãi thành công" });
+  } catch (error) {
+    next(error);
+  }
+};

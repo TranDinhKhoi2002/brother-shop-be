@@ -18,6 +18,12 @@ const createPromotionValidations = [
   validator.promotionId,
 ];
 
+const editPromotionValidations = [validator.promotionId];
+
+const deletePromotionValidations = [validator.promotionId];
+
 module.exports = {
   createPromotionValidations,
+  deletePromotionValidations,
+  editPromotionValidations,
 };
