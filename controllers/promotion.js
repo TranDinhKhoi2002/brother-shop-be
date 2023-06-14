@@ -1,10 +1,9 @@
 const Promotion = require("../models/promotion");
-const Category = require("../models/category");
 const AppError = require("../util/error");
 
 exports.getPromotions = async (req, res, next) => {
   try {
-    const promotions = await Promotion.find().populate("categories");
+    const promotions = await Promotion.find();
     res.status(200).json({ promotions });
   } catch (error) {
     next(error);
@@ -27,22 +26,17 @@ exports.getPromotionById = async (req, res, next) => {
 };
 
 exports.createPromotion = async (req, res, next) => {
-  const { name, categories, percentage, startDate, endDate } = req.body;
+  const { name, description, percentage, startDate, endDate, amount, minPrice } = req.body;
 
   try {
-    for (const categoryId of categories) {
-      const category = await Category.findById(categoryId);
-      if (!category) {
-        throw new AppError(404, "Danh mục sản phẩm không tồn tại");
-      }
-    }
-
     const promotion = new Promotion({
       name,
-      categories,
+      description,
       percentage,
       startDate,
       endDate,
+      amount,
+      minPrice,
     });
     await promotion.save();
 
@@ -53,7 +47,7 @@ exports.createPromotion = async (req, res, next) => {
 };
 
 exports.editPromotion = async (req, res, next) => {
-  const { name, categories, percentage, startDate, endDate } = req.body;
+  const { name, description, percentage, startDate, endDate, amount, minPrice } = req.body;
   const promotionId = req.params.promotionId;
 
   try {
@@ -62,18 +56,13 @@ exports.editPromotion = async (req, res, next) => {
       throw new AppError(404, "Khuyến mãi không tồn tại");
     }
 
-    for (const categoryId of categories) {
-      const category = await Category.findById(categoryId);
-      if (!category) {
-        throw new AppError(404, "Danh mục sản phẩm không tồn tại");
-      }
-    }
-
     promotion.name = name;
-    promotion.categories = categories;
+    promotion.description = description;
     promotion.percentage = percentage;
     promotion.startDate = startDate;
     promotion.endDate = endDate;
+    promotion.amount = amount;
+    promotion.minPrice = minPrice;
     await promotion.save();
 
     res.status(200).json({ message: "Cập nhật khuyến mãi thành công" });
@@ -91,7 +80,9 @@ exports.deletePromotion = async (req, res, next) => {
       throw new AppError(404, "Khuyến mãi không tồn tại");
     }
 
-    await Promotion.findByIdAndDelete(promotionId);
+    promotion.expired = true;
+    await promotion.save();
+
     res.status(200).json({ message: "Xóa khuyến mãi thành công" });
   } catch (error) {
     next(error);

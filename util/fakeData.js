@@ -4,6 +4,7 @@ const Customer = require("../models/customer");
 const Event = require("../models/event");
 const Role = require("../models/role");
 const Order = require("../models/order");
+const Promotion = require("../models/promotion");
 const { faker } = require("@faker-js/faker");
 
 const { cloudinary } = require("./cloudinary");
@@ -642,28 +643,38 @@ exports.generateData = async () => {
    * Update address to array of addresses
    */
 
+  // const customers = await Customer.find();
+  // for (const customer of customers) {
+  //   customer.address = [
+  //     {
+  //       name: "Trần Đình Khôi",
+  //       phone: "0349175927",
+  //       city: "Tỉnh Bến Tre",
+  //       district: "Huyện Ba Tri",
+  //       ward: "Thị trấn Ba Tri",
+  //       detail: "35 Lê Tặng KP2 Ba Tri Bến Tre",
+  //       isDefault: true,
+  //     },
+  //     {
+  //       name: "Trần Tự Cường",
+  //       phone: "0349175927",
+  //       city: "Tỉnh Cà Mau",
+  //       district: "Huyện Năm Căn",
+  //       ward: "Xã Hàm Rồng",
+  //       detail: "207 Đường Số 138",
+  //       isDefault: false,
+  //     },
+  //   ];
+  //   await customer.save();
+  // }
+
+  /**
+   * Update promotions for each customer
+   */
+
   const customers = await Customer.find();
   for (const customer of customers) {
-    customer.address = [
-      {
-        name: "Trần Đình Khôi",
-        phone: "0349175927",
-        city: "Tỉnh Bến Tre",
-        district: "Huyện Ba Tri",
-        ward: "Thị trấn Ba Tri",
-        detail: "35 Lê Tặng KP2 Ba Tri Bến Tre",
-        isDefault: true,
-      },
-      {
-        name: "Trần Tự Cường",
-        phone: "0349175927",
-        city: "Tỉnh Cà Mau",
-        district: "Huyện Năm Căn",
-        ward: "Xã Hàm Rồng",
-        detail: "207 Đường Số 138",
-        isDefault: false,
-      },
-    ];
+    customer.promotions = [];
     await customer.save();
   }
 };

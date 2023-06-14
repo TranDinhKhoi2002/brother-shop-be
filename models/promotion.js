@@ -7,15 +7,21 @@ const promotionSchema = new Schema(
       type: String,
       required: true,
     },
-    categories: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
-        required: true,
-      },
-    ],
+    description: {
+      type: String,
+      required: true,
+    },
     percentage: {
       type: Number,
+      required: true,
+    },
+    minPrice: {
+      type: Number,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      default: 0,
       required: true,
     },
     startDate: {
@@ -24,6 +30,11 @@ const promotionSchema = new Schema(
     },
     endDate: {
       type: Date,
+      required: true,
+    },
+    expired: {
+      type: Boolean,
+      default: false,
       required: true,
     },
   },

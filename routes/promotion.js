@@ -10,9 +10,9 @@ const {
 } = require("../validations/promotion");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 
-router.get("/promotions", isStaffAuth, promotionController.getPromotions);
+router.get("/promotions", promotionController.getPromotions);
 
-router.get("/promotions/:promotionId", isStaffAuth, promotionController.getPromotionById);
+router.get("/promotions/:promotionId", promotionController.getPromotionById);
 
 router.post(
   "/promotions",
