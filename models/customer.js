@@ -18,6 +18,7 @@ const customerSchema = new Schema({
   promotions: [
     {
       type: Schema.Types.ObjectId,
+      ref: "Promotion",
       required: true,
     },
   ],

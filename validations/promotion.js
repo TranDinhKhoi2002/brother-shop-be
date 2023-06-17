@@ -8,7 +8,9 @@ const validator = {
   endDate: body("endDate", "Ngày kết thúc không hợp lệ").isISO8601().toDate(),
   amount: body("amount").isInt().withMessage("Số lượng khuyến mãi không hợp lệ"),
   minPrice: body("minPrice").isInt().withMessage("Số lượng khuyến mãi không hợp lệ"),
-  promotionId: param("promotionId").isMongoId().withMessage("Mã sản phẩm không hợp lệ"),
+  promotionParamId: param("promotionId").isMongoId().withMessage("Mã sản phẩm không hợp lệ"),
+  promotionBodyId: body("promotionId").isMongoId().withMessage("Mã khuyễn mãi không hợp lệ"),
+  customerId: body("customerId").isMongoId().withMessage("Mã khách hàng không hợp lệ"),
 };
 
 const createPromotionValidations = [
@@ -28,14 +30,20 @@ const editPromotionValidations = [
   validator.startDate,
   validator.endDate,
   validator.amount,
-  validator.promotionId,
+  validator.promotionParamId,
   validator.minPrice,
 ];
 
-const deletePromotionValidations = [validator.promotionId];
+const deletePromotionValidations = [validator.promotionParamId];
+
+const savePromotionValidations = [validator.promotionBodyId, validator.customerId];
+
+const removePromotionValidations = [validator.promotionParamId];
 
 module.exports = {
   createPromotionValidations,
   deletePromotionValidations,
   editPromotionValidations,
+  savePromotionValidations,
+  removePromotionValidations,
 };

@@ -1,3 +1,4 @@
+const Customer = require("../models/customer");
 const Promotion = require("../models/promotion");
 const AppError = require("../util/error");
 
@@ -84,6 +85,54 @@ exports.deletePromotion = async (req, res, next) => {
     await promotion.save();
 
     res.status(200).json({ message: "Xóa khuyến mãi thành công" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.savePromotion = async (req, res, next) => {
+  const { promotionId, customerId } = req.body;
+
+  try {
+    const customer = await Customer.findById(customerId);
+    if (!customer) {
+      throw new AppError(404, "Khách hàng không tồn tại");
+    }
+
+    const promotion = await Promotion.findById(promotionId);
+    if (!promotion) {
+      throw new AppError(404, "Khuyến mãi không tồn tại");
+    }
+
+    customer.promotions.push(promotionId);
+    await customer.save();
+
+    res.status(200).json({ message: "Lưu khuyến mãi thành công", promotion });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.removePromotion = async (req, res, next) => {
+  const promotionId = req.params.promotionId;
+  const customerId = req.customerId;
+
+  try {
+    const promotion = await Promotion.findById(promotionId);
+    if (!promotion) {
+      throw new AppError(404, "Khuyến mãi không tồn tại");
+    }
+
+    const customer = await Customer.findById(customerId).populate("promotions");
+    if (!customer) {
+      throw new AppError(404, "Khách hàng không tồn tại");
+    }
+
+    const updatedPromotions = customer.promotions.filter((promotion) => promotion._id.toString() !== promotionId);
+    customer.promotions = updatedPromotions;
+    await customer.save();
+
+    res.status(200).json({ message: "Xóa mã thành công", updatedPromotions });
   } catch (error) {
     next(error);
   }

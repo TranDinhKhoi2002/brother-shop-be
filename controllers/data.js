@@ -25,7 +25,8 @@ exports.getCommonData = async (req, res, next) => {
     const customer = await Customer.findById(customerId)
       .populate("account")
       .populate("cart.productId")
-      .populate("orders");
+      .populate("orders")
+      .populate("promotions");
 
     res.status(200).json({ categories, customer: customer });
   } catch (error) {
