@@ -7,8 +7,6 @@ module.exports = {
     io = require("socket.io")(httpServer, {
       cors: {
         origin: "*",
-        allowedHeaders: ["my-custom-header"],
-        credentials: true,
       },
     });
     return io;
