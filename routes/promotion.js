@@ -10,6 +10,7 @@ const {
   editPromotionValidations,
   savePromotionValidations,
   removePromotionValidations,
+  updatePromotionQuantityValidations,
 } = require("../validations/promotion");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
 
@@ -55,6 +56,13 @@ router.delete(
   removePromotionValidations,
   validationErrorHandler,
   promotionController.removePromotion
+);
+
+router.put(
+  "/promotions/:promotionId/quantity",
+  updatePromotionQuantityValidations,
+  validationErrorHandler,
+  promotionController.updatePromotionQuantity
 );
 
 module.exports = router;

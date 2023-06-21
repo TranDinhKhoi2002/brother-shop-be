@@ -137,3 +137,21 @@ exports.removePromotion = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updatePromotionQuantity = async (req, res, next) => {
+  const promotionId = req.params.promotionId;
+
+  try {
+    const promotion = await Promotion.findById(promotionId);
+    if (!promotion) {
+      throw new AppError(404, "Khuyến mãi không tồn tại");
+    }
+
+    promotion.amount -= 1;
+    await promotion.save();
+
+    res.status(200).json({ updatedPromotion: promotion });
+  } catch (error) {
+    next(error);
+  }
+};

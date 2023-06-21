@@ -87,9 +87,12 @@ exports.createOrder = async (req, res, next) => {
       },
     });
 
+    let updatedOrders;
+
     if (customerId) {
-      const customer = await Customer.findById(customerId);
+      const customer = await Customer.findById(customerId).populate("orders");
       if (customer) {
+        updatedOrders = [...customer.orders, order];
         customer.cart = [];
         customer.orders.push(order._id);
         await customer.save();
@@ -98,7 +101,7 @@ exports.createOrder = async (req, res, next) => {
 
     io.getIO().emit("orders", { action: "create", productSizes });
 
-    res.status(200).json({ message: "Đặt hàng thành công", orderId: order._id });
+    res.status(200).json({ message: "Đặt hàng thành công", orderId: order._id, updatedOrders });
   } catch (error) {
     const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
     next(err);

@@ -40,10 +40,13 @@ const savePromotionValidations = [validator.promotionBodyId, validator.customerI
 
 const removePromotionValidations = [validator.promotionParamId];
 
+const updatePromotionQuantityValidations = [validator.promotionParamId];
+
 module.exports = {
   createPromotionValidations,
   deletePromotionValidations,
   editPromotionValidations,
   savePromotionValidations,
   removePromotionValidations,
+  updatePromotionQuantityValidations,
 };
