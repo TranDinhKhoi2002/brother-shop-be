@@ -3,11 +3,11 @@
  */
 
 // Product States
-const productStates = {
+const productStates = Object.freeze({
   ACTIVE: "Đang bán",
   PAUSE: "Ngừng bán",
   OUT_OF_STOCK: "Hết hàng",
-};
+});
 
 const orderShippingStatuses = {
   PREPARING: "Đang chuẩn bị",
@@ -22,12 +22,11 @@ const orderPaymentStatuses = {
 };
 
 // Role Names
-const roleNames = {
+const roleNames = Object.freeze({
   OWNER: "Chủ cửa hàng",
-  MANAGER: "Quản lý",
   STAFF: "Nhân viên",
   CLIENT: "Khách hàng",
-};
+});
 
 // User: Gender & Status
 const genders = {

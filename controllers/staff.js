@@ -5,12 +5,12 @@ const Staff = require("../models/staff");
 const Account = require("../models/account");
 const Role = require("../models/role");
 const AppError = require("../util/error");
-const { staffStates } = require("../constants");
+const { staffStates, roleNames } = require("../constants");
 
 sgMail.setApiKey(process.env.SG_API_KEY);
 
 exports.createStaff = async (req, res, next) => {
-  const { role, name, address, email, phone, gender, birthday } = req.body;
+  const { name, address, email, phone, gender, birthday } = req.body;
 
   try {
     const existingEmail = await Staff.findOne({ email });
@@ -28,9 +28,11 @@ exports.createStaff = async (req, res, next) => {
     const account = new Account({ username: email, password: hashedPassword });
     await account.save();
 
+    const staffRole = await Role.findOne({ name: roleNames.STAFF });
+
     const staff = new Staff({
       account: account._id,
-      role,
+      role: staffRole._id,
       name,
       address,
       email,
@@ -56,7 +58,7 @@ exports.createStaff = async (req, res, next) => {
 };
 
 exports.updateStaff = async (req, res, next) => {
-  const { role, name, address, email, phone, gender, birthday, staffId, status } = req.body;
+  const { name, address, email, phone, gender, birthday, staffId, status } = req.body;
 
   try {
     const staff = await Staff.findById(staffId);
@@ -69,7 +71,6 @@ exports.updateStaff = async (req, res, next) => {
       throw new AppError(404, "Chức vụ không tồn tại");
     }
 
-    staff.role = role;
     staff.name = name;
     staff.address = address;
     staff.email = email;
@@ -123,6 +124,27 @@ exports.getStaffById = async (req, res, next) => {
     }
 
     res.status(200).json({ staff });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.changePassword = async (req, res, next) => {
+  const { password } = req.body;
+  const staffId = req.staffId;
+
+  try {
+    const staff = await Staff.findById(staffId);
+    if (!staff) {
+      throw new AppError(404, "Nhân viên không tồn tại");
+    }
+
+    const account = await Account.findById(staff.account);
+    const hashedPassword = bcryptjs.hashSync(password, 12);
+    account.password = hashedPassword;
+    await account.save();
+
+    res.status(200).json({ message: "Thay đổi mật khẩu thành công" });
   } catch (error) {
     next(error);
   }
