@@ -41,6 +41,12 @@ exports.createPromotion = async (req, res, next) => {
     });
     await promotion.save();
 
+    const milliseconds = endDate.getTime() - startDate.getTime();
+    setTimeout(() => {
+      promotion.expired = true;
+      promotion.save();
+    }, milliseconds);
+
     res.status(201).json({ promotion, message: "Tạo khuyến mãi thành công" });
   } catch (error) {
     next(error);
