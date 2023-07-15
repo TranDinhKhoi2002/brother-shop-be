@@ -66,11 +66,6 @@ exports.updateStaff = async (req, res, next) => {
       throw new AppError(404, "Nhân viên không tồn tại");
     }
 
-    const existingRole = await Role.findById(role);
-    if (!existingRole) {
-      throw new AppError(404, "Chức vụ không tồn tại");
-    }
-
     staff.name = name;
     staff.address = address;
     staff.email = email;
