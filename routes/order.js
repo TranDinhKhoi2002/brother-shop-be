@@ -4,7 +4,12 @@ const router = express.Router();
 const orderController = require("../controllers/order");
 const isStaffAuth = require("../middleware/isStaffAuth");
 const validationErrorHandler = require("../middleware/validationErrorHandler");
-const { createOrderValidations, checkOutOrderValidations, deleteOrderValidations } = require("../validations/order");
+const {
+  createOrderValidations,
+  checkOutOrderValidations,
+  deleteOrderValidations,
+  updateOrderStatusValidations,
+} = require("../validations/order");
 
 router.get("/orders", orderController.getOrders);
 
@@ -16,6 +21,12 @@ router.put("/orders/check-out", checkOutOrderValidations, validationErrorHandler
 
 router.delete("/orders", isStaffAuth, deleteOrderValidations, validationErrorHandler, orderController.deleteOrder);
 
-router.put("/orders/:orderId/status", isStaffAuth, orderController.updateOrderStatus);
+router.put(
+  "/orders/:orderId/status",
+  isStaffAuth,
+  updateOrderStatusValidations,
+  validationErrorHandler,
+  orderController.updateOrderStatus
+);
 
 module.exports = router;

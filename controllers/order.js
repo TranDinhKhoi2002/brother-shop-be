@@ -188,7 +188,7 @@ exports.getOrderById = async (req, res, next) => {
 
 exports.updateOrderStatus = async (req, res, next) => {
   const orderId = req.params.orderId;
-  const status = req.body.status;
+  const { shippingStatus, paymentStatus } = req.body;
 
   try {
     const order = await Order.findById(orderId);
@@ -196,14 +196,20 @@ exports.updateOrderStatus = async (req, res, next) => {
       throw new AppError(404, "Đơn hàng không tồn tại");
     }
 
-    order.shippingStatus = status;
+    order.shippingStatus = shippingStatus;
+    order.paymentStatus = paymentStatus;
     await order.save();
 
-    io.getIO().emit("orders", { action: "edit", orderId, orderStatus: status });
+    io.getIO().emit("orders", {
+      action: "edit",
+      orderId,
+      orderShippingStatus: shippingStatus,
+      orderPaymentStatus: paymentStatus,
+    });
 
     res
       .status(200)
-      .json({ message: "Cập nhật đơn hàng thành công", orderId: order._id.toString(), orderStatus: status });
+      .json({ message: "Cập nhật đơn hàng thành công", orderId: order._id.toString(), orderStatus: shippingStatus });
   } catch (error) {
     next(error);
   }

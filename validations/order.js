@@ -1,4 +1,5 @@
 const { body } = require("express-validator");
+const { orderShippingStatuses, orderPaymentStatuses } = require("../constants");
 
 const phoneRegEx = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
 
@@ -17,6 +18,12 @@ const validator = {
   shippingPrice: body("shippingPrice").isNumeric().withMessage("Phí vận chuyển phải là số"),
   totalPrice: body("totalPrice").isNumeric().withMessage("Tổng tiền đơn hàng phải là số"),
   orderId: body("orderId").isMongoId().withMessage("Mã đơn hàng không hợp lệ"),
+  shippingStatus: body("shippingStatus")
+    .isIn(Object.values(orderShippingStatuses))
+    .withMessage("Trạng thái đơn hàng không hợp lệ"),
+  paymentStatus: body("paymentStatus")
+    .isIn(Object.values(orderPaymentStatuses))
+    .withMessage("Tình trạng thanh toán không hợp lệ"),
 };
 
 const createOrderValidations = [
@@ -34,4 +41,11 @@ const checkOutOrderValidations = [validator.orderId];
 
 const deleteOrderValidations = [validator.orderId];
 
-module.exports = { createOrderValidations, checkOutOrderValidations, deleteOrderValidations };
+const updateOrderStatusValidations = [validator.shippingStatus, validator.paymentStatus];
+
+module.exports = {
+  createOrderValidations,
+  checkOutOrderValidations,
+  deleteOrderValidations,
+  updateOrderStatusValidations,
+};
