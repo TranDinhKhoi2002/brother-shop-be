@@ -25,10 +25,10 @@ exports.getRevenue = async (req, res, next) => {
 
   try {
     const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - days);
+    const duration = new Date();
+    duration.setDate(today.getDate() - days);
 
-    const orders = await Order.find({ paymentStatus: orderPaymentStatuses.PAID, createdAt: { $gte: lastWeek } });
+    const orders = await Order.find({ paymentStatus: orderPaymentStatuses.PAID, createdAt: { $gte: duration } });
 
     const data = orders.map((order) => ({
       date: new Date(order.createdAt).toLocaleDateString(),
@@ -92,10 +92,8 @@ exports.getTrendOfCategories = async (req, res, next) => {
   try {
     const orders = await Order.find({ paymentStatus: orderPaymentStatuses.PAID }).populate("products.product");
 
-    const data = [];
+    const items = [];
     for (const order of orders) {
-      const items = [];
-
       for (const product of order.products) {
         const category = await Category.findById(product.product.category);
 
@@ -115,11 +113,9 @@ exports.getTrendOfCategories = async (req, res, next) => {
           items[existingItemIndex].sold += product.amount;
         }
       }
-
-      data.push(...items);
     }
 
-    res.status(200).json({ data });
+    res.status(200).json({ data: items });
   } catch (error) {
     next(error);
   }
