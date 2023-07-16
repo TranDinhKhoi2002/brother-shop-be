@@ -30,12 +30,21 @@ exports.getRevenue = async (req, res, next) => {
 
     const orders = await Order.find({ paymentStatus: orderPaymentStatuses.PAID, createdAt: { $gte: duration } });
 
-    const data = orders.map((order) => ({
-      date: new Date(order.createdAt).toLocaleDateString(),
-      revenue: order.totalProductsPrice,
-    }));
+    const items = [];
+    orders.forEach((order) => {
+      const existingItemIndex = items.findIndex((item) => item.date === new Date(order.createdAt).toLocaleDateString());
 
-    res.status(200).json({ data });
+      if (existingItemIndex === -1) {
+        items.push({
+          date: new Date(order.createdAt).toLocaleDateString(),
+          revenue: order.totalProductsPrice,
+        });
+      } else {
+        items[existingItemIndex].revenue += order.totalProductsPrice;
+      }
+    });
+
+    res.status(200).json({ data: items });
   } catch (error) {
     next(error);
   }
