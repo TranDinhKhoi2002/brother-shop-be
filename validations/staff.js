@@ -12,7 +12,8 @@ const validator = {
   gender: body("gender").isIn(Object.values(genders)).withMessage("Giới tính không hợp lệ"),
   birthday: body("birthday", "Ngày sinh không hợp lệ").isISO8601(),
   staffId: body("staffId").isMongoId().withMessage("Mã nhân viên không hợp lệ"),
-  password: body("password", "Mật khẩu phải có ít nhất 8 ký tự").isLength({ min: 8 }).isAlphanumeric().trim(),
+  newPassword: body("newPassword", "Mật khẩu mới phải có ít nhất 8 ký tự").isLength({ min: 8 }).isAlphanumeric().trim(),
+  oldPassword: body("oldPassword", "Mật khẩu cũ không hợp lệ").isLength({ min: 8 }).isAlphanumeric().trim(),
 };
 
 const createStaffValidations = [
@@ -36,7 +37,7 @@ const updateStaffValidations = [
 
 const deleteStaffValidations = [validator.staffId];
 
-const changeStaffPasswordValidations = [validator.password];
+const changeStaffPasswordValidations = [validator.newPassword, validator.oldPassword];
 
 module.exports = {
   createStaffValidations,

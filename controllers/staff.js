@@ -125,7 +125,7 @@ exports.getStaffById = async (req, res, next) => {
 };
 
 exports.changePassword = async (req, res, next) => {
-  const { password } = req.body;
+  const { newPassword, oldPassword } = req.body;
   const staffId = req.staffId;
 
   try {
@@ -135,7 +135,12 @@ exports.changePassword = async (req, res, next) => {
     }
 
     const account = await Account.findById(staff.account);
-    const hashedPassword = bcryptjs.hashSync(password, 12);
+    const isOldValidPassword = bcryptjs.compareSync(oldPassword, account.password);
+    if (!isOldValidPassword) {
+      throw new AppError(401, "Mật khẩu cũ không đúng");
+    }
+
+    const hashedPassword = bcryptjs.hashSync(newPassword, 12);
     account.password = hashedPassword;
     await account.save();
 
