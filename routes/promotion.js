@@ -65,4 +65,6 @@ router.put(
   promotionController.updatePromotionQuantity
 );
 
+router.put("/promotions/:promotionId/restore", promotionController.restorePromotion);
+
 module.exports = router;
