@@ -6,7 +6,7 @@ const validator = {
   id: body("categoryId").isMongoId().withMessage("Mã danh mục sản phẩm không hợp lệ"),
 };
 
-const createCategoryValidations = [validator.name, validator.types];
+const createCategoryValidations = [validator.name];
 
 const updateCategoryValidations = [validator.name, validator.types, validator.id];
 

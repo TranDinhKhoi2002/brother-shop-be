@@ -53,7 +53,7 @@ exports.createCategory = async (req, res, next) => {
       throw new AppError(401, "Bạn không có quyền tạo danh mục sản phẩm");
     }
 
-    const formattedTypes = types.map((type) => ({ type, products: [] }));
+    const formattedTypes = types ? types.map((type) => ({ type, products: [] })) : [];
 
     const category = new Category({
       name,
