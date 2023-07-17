@@ -53,6 +53,7 @@ exports.createOrder = async (req, res, next) => {
       if (existingProduct) {
         const selectedSizeIndex = existingProduct.sizes.findIndex((size) => size.name === item.size);
         existingProduct.sizes[selectedSizeIndex].sold += item.amount;
+        existingProduct.totalSold += item.amount;
 
         productSizes.push({
           productId: existingProduct._id.toString(),
