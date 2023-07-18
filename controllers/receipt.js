@@ -75,6 +75,8 @@ exports.updateReceipt = async (req, res, next) => {
     receipt.products = updatedProducts;
     await receipt.save();
 
+    io.getIO().emit("receipts", { action: "edit", editedReceipt: receipt });
+
     res.status(200).json({
       message: "Cập nhật phiếu nhập hàng thành công",
       updatedReceipt: receipt,
