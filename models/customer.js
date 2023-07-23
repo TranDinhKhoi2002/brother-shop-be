@@ -14,7 +14,13 @@ const customerSchema = new Schema({
       required: true,
     },
   ],
-  wishlist: [],
+  wishlist: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+  ],
   promotions: [
     {
       type: Schema.Types.ObjectId,

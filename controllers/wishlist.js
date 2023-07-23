@@ -3,7 +3,7 @@ const AppError = require("../util/error");
 
 exports.addToWishlist = async (req, res, next) => {
   const customerId = req.customerId;
-  const product = req.body.product;
+  const productId = req.body.productId;
 
   try {
     const customer = await Customer.findById(customerId);
@@ -11,12 +11,12 @@ exports.addToWishlist = async (req, res, next) => {
       throw new AppError(404, "Không tìm thấy khách hàng");
     }
 
-    const existingProduct = customer.wishlist.find((item) => item._id === product._id);
+    const existingProduct = customer.wishlist.find((item) => item.toString() === productId.toString());
     if (existingProduct) {
       return res.status(422).json({ message: "Sản phẩm này đã tồn tại trong danh sách yêu thích" });
     }
 
-    customer.wishlist.push(product);
+    customer.wishlist.push(productId);
     await customer.save();
 
     res.status(200).json({ wishlist: customer.wishlist, message: "Đã thêm sản phẩm vào danh sách yêu thích" });
@@ -40,7 +40,7 @@ exports.removeFromWishlist = async (req, res, next) => {
       return res.status(422).json({ message: "Sản phẩm không tồn tại trong danh sách yêu thích" });
     }
 
-    const updatedProducts = customer.wishlist.filter((item) => item._id !== productId);
+    const updatedProducts = customer.wishlist.filter((item) => item.toString() !== productId.toString());
     customer.wishlist = updatedProducts;
     await customer.save();
 
