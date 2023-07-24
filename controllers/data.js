@@ -26,6 +26,7 @@ exports.getCommonData = async (req, res, next) => {
       .populate("account")
       .populate("cart.productId")
       .populate("orders")
+      .populate("wishlist")
       .populate("promotions");
 
     res.status(200).json({ categories, customer: customer });
