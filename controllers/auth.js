@@ -32,6 +32,7 @@ exports.login = async (req, res, next) => {
       .populate("account")
       .populate("cart.productId")
       .populate("orders")
+      .populate('wishlist')
       .populate("promotions");
 
     const token = jwt.sign(
@@ -61,6 +62,7 @@ exports.loginWithSocialMediaAccount = async (req, res, next) => {
       .populate("account")
       .populate("cart.productId")
       .populate("orders")
+      .populate('wishlist')
       .populate("promotions");
     if (!customer) {
       customer = new Customer({

@@ -11,7 +11,7 @@ exports.updateProfile = async (req, res, next) => {
   try {
     const { name, phoneNumber, birthday, gender } = req.body;
 
-    const customer = await Customer.findById(customerId).populate("cart.productId").populate("orders");
+    const customer = await Customer.findById(customerId).populate("cart.productId").populate("orders").populate('wishlist');
     if (!customer) {
       throw new AppError(404, "Khách hàng không tồn tại");
     }
@@ -227,7 +227,7 @@ exports.updateAddressToDefault = async (req, res, next) => {
 
 exports.getCustomers = async (req, res, next) => {
   try {
-    const customers = await Customer.find().populate("orders").populate("cart.productId");
+    const customers = await Customer.find().populate("orders").populate("cart.productId").populate('wishlist');
     res.status(200).json({ customers });
   } catch (error) {
     const err = new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau");
@@ -239,7 +239,7 @@ exports.getCustomerById = async (req, res, next) => {
   const customerId = req.params.customerId;
 
   try {
-    const customer = await Customer.findById(customerId).populate("orders").populate("cart.productId");
+    const customer = await Customer.findById(customerId).populate("orders").populate("cart.productId").populate('wishlist');
     if (!customer) {
       throw new AppError(404, "Khách hàng không tồn tại");
     }
