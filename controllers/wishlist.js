@@ -41,7 +41,7 @@ exports.removeFromWishlist = async (req, res, next) => {
       throw new AppError(404, "Không tìm thấy khách hàng");
     }
 
-    const existingProduct = customer.wishlist.find((item) => item._id === productId);
+    const existingProduct = customer.wishlist.find((item) => item.toString() === productId.toString());
     if (!existingProduct) {
       return res.status(422).json({ message: "Sản phẩm không tồn tại trong danh sách yêu thích" });
     }
