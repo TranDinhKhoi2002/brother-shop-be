@@ -36,17 +36,17 @@ exports.removeFromWishlist = async (req, res, next) => {
   const productId = req.body.productId;
 
   try {
-    const customer = await Customer.findById(customerId);
+    const customer = await Customer.findById(customerId).populate('wishlist');
     if (!customer) {
       throw new AppError(404, "Không tìm thấy khách hàng");
     }
 
-    const existingProduct = customer.wishlist.find((item) => item.toString() === productId.toString());
+    const existingProduct = customer.wishlist.find((item) => item._id.toString() === productId.toString());
     if (!existingProduct) {
       return res.status(422).json({ message: "Sản phẩm không tồn tại trong danh sách yêu thích" });
     }
 
-    const updatedProducts = customer.wishlist.filter((item) => item.toString() !== productId.toString());
+    const updatedProducts = customer.wishlist.filter((item) => item._id.toString() !== productId.toString());
     customer.wishlist = updatedProducts;
     await customer.save();
 
