@@ -1,16 +1,16 @@
-const { ITEMS_PER_PAGE, sizes, productStates } = require("../constants");
-const Category = require("../models/category");
-const Product = require("../models/product");
-const { cloudinary } = require("../util/cloudinary");
-const AppError = require("../util/error");
-const io = require("../socket");
+const { ITEMS_PER_PAGE, sizes, productStates } = require('../constants');
+const Category = require('../models/category');
+const Product = require('../models/product');
+const { cloudinary } = require('../util/cloudinary');
+const AppError = require('../util/error');
+const io = require('../socket');
 
 exports.getProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
     res.status(200).json({ products });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error('Có lỗi xảy ra, vui lòng thử lại sau');
     error.statusCode = 500;
     next(error);
   }
@@ -20,16 +20,16 @@ exports.getProductById = async (req, res, next) => {
   const productId = req.params.productId;
 
   try {
-    const product = await Product.findById(productId).populate("category");
+    const product = await Product.findById(productId).populate('category');
     if (!product) {
-      const error = new Error("Không tìm thấy sản phẩm");
+      const error = new Error('Không tìm thấy sản phẩm');
       error.statusCode = 404;
       return next(error);
     }
 
     res.status(200).json({ product });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error('Có lỗi xảy ra, vui lòng thử lại sau');
     error.statusCode = 500;
     next(error);
   }
@@ -40,7 +40,7 @@ exports.getHotProducts = async (req, res, next) => {
     const sortedProducts = await Product.find().sort({ totalSold: -1 }).limit(12).exec();
     res.status(200).json({ products: sortedProducts });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error('Có lỗi xảy ra, vui lòng thử lại sau');
     error.statusCode = 500;
     next(error);
   }
@@ -51,7 +51,7 @@ exports.getDiscountProducts = async (req, res, next) => {
     const discountProducts = await Product.find({ oldPrice: { $ne: null } });
     res.status(200).json({ products: discountProducts });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error('Có lỗi xảy ra, vui lòng thử lại sau');
     error.statusCode = 500;
     next(error);
   }
@@ -61,10 +61,10 @@ exports.getProductsByType = async (req, res, next) => {
   const typeName = req.params.typeName;
 
   try {
-    const products = await Product.find({ name: { $regex: typeName } }).populate("category");
+    const products = await Product.find({ name: { $regex: typeName } }).populate('category');
     res.status(200).json({ products });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error('Có lỗi xảy ra, vui lòng thử lại sau');
     error.statusCode = 500;
     next(error);
   }
@@ -75,12 +75,12 @@ exports.getProductsByKeyword = async (req, res, next) => {
   const page = +req.query.page || 1;
 
   try {
-    const products = await Product.find({ name: { $regex: keyword, $options: "i" } })
-      .populate("category")
+    const products = await Product.find({ name: { $regex: keyword, $options: 'i' } })
+      .populate('category')
       .skip((page - 1) * ITEMS_PER_PAGE)
       .limit(ITEMS_PER_PAGE);
 
-    const totalItems = await Product.find({ name: { $regex: keyword, $options: "i" } }).countDocuments();
+    const totalItems = await Product.find({ name: { $regex: keyword, $options: 'i' } }).countDocuments();
 
     res.status(200).json({
       products,
@@ -92,7 +92,7 @@ exports.getProductsByKeyword = async (req, res, next) => {
       lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
     });
   } catch (err) {
-    const error = new Error("Có lỗi xảy ra, vui lòng thử lại sau");
+    const error = new Error('Có lỗi xảy ra, vui lòng thử lại sau');
     error.statusCode = 500;
     next(error);
   }
@@ -100,20 +100,32 @@ exports.getProductsByKeyword = async (req, res, next) => {
 
 exports.getProductsByFilters = async (req, res, next) => {
   try {
-    const category = await Category.findOne({ "types._id": req.query.categoryId }).populate("products").populate({
-      path: "types",
-      populate: "products",
+    let products = [];
+    let category = await Category.findOne({ 'types._id': req.query.categoryId }).populate('products').populate({
+      path: 'types',
+      populate: 'products',
     });
     if (!category) {
-      return res.status(200).json({ products: [] });
+      category = await Category.findById(req.query.categoryId).populate('products').populate({
+        path: 'types',
+        populate: 'products',
+      });
+      products = category.products;
+    } else {
+      const selectedType = category.types.find((type) => type._id.toString() === req.query.categoryId);
+      products = selectedType.products;
     }
 
-    let products = category.products;
+    if (!category) {
+      return res.status(404).json({ products: [] });
+    }
 
-    if (req.query.types !== "null") {
+    // let products = category.products;
+
+    if (req.query.types !== 'null') {
       products = [];
 
-      const types = req.query.types.split(",");
+      const types = req.query.types.split(',');
       const categoryTypes = category.types;
 
       for (const type of types) {
@@ -122,31 +134,32 @@ exports.getProductsByFilters = async (req, res, next) => {
       }
     }
 
-    if (req.query.priceFrom !== "null" && req.query.priceTo !== "null") {
+    if (req.query.priceFrom !== 'null' && req.query.priceTo !== 'null') {
       const priceFrom = +req.query.priceFrom;
       const priceTo = +req.query.priceTo;
 
       products = products.filter((product) => product.price >= priceFrom && product.price <= priceTo);
     }
 
-    if (req.query.materials !== "null") {
-      const materials = req.query.materials.split(",");
+    if (req.query.materials !== 'null') {
+      const materials = req.query.materials.split(',');
       products = products.filter(
         (product) =>
-          materials.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1
+          materials.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1,
       );
     }
 
-    if (req.query.textures !== "null") {
-      const textures = req.query.textures.split(",");
+    if (req.query.textures !== 'null') {
+      const textures = req.query.textures.split(',');
       products = products.filter(
-        (product) => textures.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1
+        (product) =>
+          textures.findIndex((item) => product.description.toLowerCase().includes(item.toLowerCase())) !== -1,
       );
     }
 
     res.status(200).json({ products });
   } catch (error) {
-    next(new AppError(500, "Có lỗi xảy ra, vui lòng thử lại sau"));
+    next(new AppError(500, 'Có lỗi xảy ra, vui lòng thử lại sau'));
   }
 };
 
@@ -170,11 +183,11 @@ exports.createProduct = async (req, res, next) => {
     if (!category) {
       const categories = await Category.find();
       category = categories.find(
-        (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1
+        (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1,
       );
 
       if (!category) {
-        throw new AppError(422, "Mã danh mục không tồn tại");
+        throw new AppError(422, 'Mã danh mục không tồn tại');
       }
     }
 
@@ -197,9 +210,9 @@ exports.createProduct = async (req, res, next) => {
 
     await category.save();
 
-    io.getIO().emit("products", { action: "create", product: product });
+    io.getIO().emit('products', { action: 'create', product: product });
 
-    res.status(201).json({ message: "Tạo sản phẩm thành công", product });
+    res.status(201).json({ message: 'Tạo sản phẩm thành công', product });
   } catch (error) {
     next(error);
   }
@@ -212,14 +225,14 @@ exports.updateProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      throw new AppError("Sản phẩm không tồn tại");
+      throw new AppError('Sản phẩm không tồn tại');
     }
 
     /**
      * Handle uploading images
      */
     if (mainImg) {
-      const splitedMainImgPath = product.images.mainImg.split("/");
+      const splitedMainImgPath = product.images.mainImg.split('/');
       const mainImgPublicId = splitedMainImgPath[splitedMainImgPath.length - 1];
       await cloudinary.uploader.destroy(mainImgPublicId);
 
@@ -230,7 +243,7 @@ exports.updateProduct = async (req, res, next) => {
     }
 
     if (subImg) {
-      const splitedSubImgPath = product.images.subImg.split("/");
+      const splitedSubImgPath = product.images.subImg.split('/');
       const subImgPublicId = splitedSubImgPath[splitedSubImgPath.length - 1];
       await cloudinary.uploader.destroy(subImgPublicId);
 
@@ -249,17 +262,17 @@ exports.updateProduct = async (req, res, next) => {
 
       if (oldCategory.types.length > 0) {
         const currentTypeIndex = oldCategory.types.findIndex(
-          (item) => item.products.findIndex((productId) => productId.toString() === product._id.toString()) !== -1
+          (item) => item.products.findIndex((productId) => productId.toString() === product._id.toString()) !== -1,
         );
         oldCategory.types[currentTypeIndex].products = oldCategory.types[currentTypeIndex].products.filter(
-          (productId) => productId.toString() !== product._id.toString()
+          (productId) => productId.toString() !== product._id.toString(),
         );
       }
       await oldCategory.save();
 
       const categories = await Category.find();
       let newCategory = categories.find(
-        (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1
+        (category) => category.types.findIndex((item) => item._id.toString() === categoryId) !== -1,
       );
       if (!newCategory) {
         newCategory = await Category.findById(categoryId);
@@ -287,9 +300,9 @@ exports.updateProduct = async (req, res, next) => {
     }
     await product.save();
 
-    io.getIO().emit("products", { action: "edit", updatedProduct: product });
+    io.getIO().emit('products', { action: 'edit', updatedProduct: product });
 
-    res.status(200).json({ message: "Cập nhật sản phẩm thành công" });
+    res.status(200).json({ message: 'Cập nhật sản phẩm thành công' });
   } catch (error) {
     next(error);
   }
@@ -301,15 +314,15 @@ exports.stopSelling = async (req, res, next) => {
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      throw new AppError(404, "Sản phẩm không tồn tại");
+      throw new AppError(404, 'Sản phẩm không tồn tại');
     }
 
     product.state = productStates.PAUSE;
     await product.save();
 
-    io.getIO().emit("products", { action: "delete", productId: product._id.toString() });
+    io.getIO().emit('products', { action: 'delete', productId: product._id.toString() });
 
-    res.status(200).json({ message: "Sản phẩm đã được ngừng bán" });
+    res.status(200).json({ message: 'Sản phẩm đã được ngừng bán' });
   } catch (error) {
     next(error);
   }
@@ -321,15 +334,15 @@ exports.resellProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(productId);
     if (!product) {
-      throw new AppError(404, "Sản phẩm không tồn tại");
+      throw new AppError(404, 'Sản phẩm không tồn tại');
     }
 
     product.state = productStates.ACTIVE;
     await product.save();
 
-    io.getIO().emit("products", { action: "resell", productId: product._id.toString() });
+    io.getIO().emit('products', { action: 'resell', productId: product._id.toString() });
 
-    res.status(200).json({ message: "Sản phẩm đã được bán lại" });
+    res.status(200).json({ message: 'Sản phẩm đã được bán lại' });
   } catch (error) {
     next(error);
   }
